@@ -70,8 +70,9 @@ const personas = [
 const CoffeePersonasSection = () => {
   const [activePersona, setActivePersona] = useState(0);
 
-  const handleCarouselChange = (index: number) => {
-    setActivePersona(index);
+  // Fixed: Update the type to match what Carousel expects
+  const handleCarouselChange = (index: React.SetStateAction<number>) => {
+    setActivePersona(index as number);
   };
 
   return (
@@ -117,21 +118,33 @@ const CoffeePersonasSection = () => {
                               <span className="font-medium">Energy</span>
                               <span>{persona.scores.energy}%</span>
                             </div>
-                            <Progress value={persona.scores.energy} className="h-2 bg-gray-200" indicatorClassName={`${activePersona === index ? 'animate-pulse-gentle' : ''}`} />
+                            <Progress 
+                              value={persona.scores.energy} 
+                              className="h-2 bg-gray-200" 
+                              // Removed indicatorClassName prop
+                            />
                           </div>
                           <div>
                             <div className="flex justify-between text-xs mb-1">
                               <span className="font-medium">Aroma</span>
                               <span>{persona.scores.aroma}%</span>
                             </div>
-                            <Progress value={persona.scores.aroma} className="h-2 bg-gray-200" indicatorClassName={`${activePersona === index ? 'animate-pulse-gentle' : ''}`} />
+                            <Progress 
+                              value={persona.scores.aroma} 
+                              className="h-2 bg-gray-200"
+                              // Removed indicatorClassName prop
+                            />
                           </div>
                           <div>
                             <div className="flex justify-between text-xs mb-1">
                               <span className="font-medium">Convenience</span>
                               <span>{persona.scores.convenience}%</span>
                             </div>
-                            <Progress value={persona.scores.convenience} className="h-2 bg-gray-200" indicatorClassName={`${activePersona === index ? 'animate-pulse-gentle' : ''}`} />
+                            <Progress 
+                              value={persona.scores.convenience} 
+                              className="h-2 bg-gray-200"
+                              // Removed indicatorClassName prop
+                            />
                           </div>
                         </div>
                       </div>

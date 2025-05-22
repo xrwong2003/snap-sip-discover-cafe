@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
 
 const products = [
   {
@@ -55,9 +57,11 @@ const ProductMatchSection = () => {
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-nescafe-black">{product.name}</h3>
                 <p className="text-nescafe-brown mb-4">{product.description}</p>
-                <button className="bg-nescafe-red text-white px-4 py-2 rounded-full hover:bg-nescafe-brown transition-colors self-start">
-                  Learn More
-                </button>
+                <Link to={`/quiz-results?persona=${encodeURIComponent(product.matchFor)}`}>
+                  <Button className="bg-nescafe-red text-white px-4 py-2 rounded-full hover:bg-nescafe-brown transition-colors self-start">
+                    See Persona Results
+                  </Button>
+                </Link>
               </div>
             </div>
           ))}
