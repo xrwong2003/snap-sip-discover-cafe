@@ -16,7 +16,7 @@ const steps = [
   {
     icon: <Award className="w-10 h-10 text-nescafe-red" />,
     title: "Discover",
-    description: "Based on their answers, the AI reveals their Coffee Persona — like "The Hustler," "The Dreamer," or "The Socialite.""
+    description: "Based on their answers, the AI reveals their Coffee Persona — like \"The Hustler,\" \"The Dreamer,\" or \"The Socialite.\""
   },
   {
     icon: <Gift className="w-10 h-10 text-nescafe-red" />,
