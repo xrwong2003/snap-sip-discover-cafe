@@ -70,9 +70,9 @@ const personas = [
 const CoffeePersonasSection = () => {
   const [activePersona, setActivePersona] = useState(0);
 
-  // Fixed: Update the type to match what Carousel expects
-  const handleCarouselChange = (index: React.SetStateAction<number>) => {
-    setActivePersona(index as number);
+  // Fixed: Use a proper function for onSelect that handles the carousel API type
+  const handleCarouselChange = (index: number) => {
+    setActivePersona(index);
   };
 
   return (
@@ -121,7 +121,6 @@ const CoffeePersonasSection = () => {
                             <Progress 
                               value={persona.scores.energy} 
                               className="h-2 bg-gray-200" 
-                              // Removed indicatorClassName prop
                             />
                           </div>
                           <div>
@@ -132,7 +131,6 @@ const CoffeePersonasSection = () => {
                             <Progress 
                               value={persona.scores.aroma} 
                               className="h-2 bg-gray-200"
-                              // Removed indicatorClassName prop
                             />
                           </div>
                           <div>
@@ -143,7 +141,6 @@ const CoffeePersonasSection = () => {
                             <Progress 
                               value={persona.scores.convenience} 
                               className="h-2 bg-gray-200"
-                              // Removed indicatorClassName prop
                             />
                           </div>
                         </div>
