@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Headphones, Music, Share2 } from "lucide-react";
+import { Headphones, Music, Share2, Spotify, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useToast } from "@/hooks/use-toast";
+import { spotifyPlaylists, motivationalQuotes } from "@/utils/personaData";
 
 // Sample data for coffee personas
 const personaDetails = {
@@ -19,12 +20,6 @@ const personaDetails = {
       image: "https://images.unsplash.com/photo-1574914629385-46e8178f0e9f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       description: "Quick, convenient, and gives you that instant energy boost."
     },
-    playlist: {
-      name: "Hustle Mode On",
-      description: "Upbeat tracks to keep your productivity high all day.",
-      tracks: ["Power Up by Imagine Dragons", "Work from Home by Fifth Harmony", "9 to 5 by Dolly Parton"]
-    },
-    quote: "The future belongs to those who believe in the beauty of their dreams.",
     coupon: "HUSTLE20"
   },
   "The Dreamer": {
@@ -37,12 +32,6 @@ const personaDetails = {
       image: "https://images.unsplash.com/photo-1568649929103-28ffbefaca1e?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       description: "A smooth, aromatic blend to inspire your creative thoughts."
     },
-    playlist: {
-      name: "Creative Flow",
-      description: "Ambient melodies to inspire your imagination.",
-      tracks: ["Dreams by Fleetwood Mac", "Imagine by John Lennon", "Daydreamer by Adele"]
-    },
-    quote: "Every great dream begins with a dreamer.",
     coupon: "DREAM15"
   },
   "The Socialite": {
@@ -55,12 +44,6 @@ const personaDetails = {
       image: "https://images.unsplash.com/photo-1527156231393-7023794f363c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       description: "Refreshing and ready to share with friends anywhere, anytime."
     },
-    playlist: {
-      name: "Social Vibes",
-      description: "Fun tracks for gathering with friends and making memories.",
-      tracks: ["Good Time by Owl City & Carly Rae Jepsen", "We Are Young by Fun", "Uptown Funk by Mark Ronson ft. Bruno Mars"]
-    },
-    quote: "Surround yourself with those who make you happy.",
     coupon: "SOCIAL25"
   },
   "The Zen Master": {
@@ -73,12 +56,6 @@ const personaDetails = {
       image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       description: "A traditional blend for those who appreciate ritual."
     },
-    playlist: {
-      name: "Mindful Moments",
-      description: "Peaceful melodies for mindfulness and relaxation.",
-      tracks: ["Zen Garden by Enya", "Breathe by Télépopmusik", "Meditation by Hans Zimmer"]
-    },
-    quote: "Peace comes from within. Do not seek it without.",
     coupon: "ZEN10"
   },
   "The Adventurer": {
@@ -91,12 +68,6 @@ const personaDetails = {
       image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       description: "Explore coffee flavors from around the world."
     },
-    playlist: {
-      name: "Adventure Awaits",
-      description: "Songs to fuel your next journey and exploration.",
-      tracks: ["On Top Of The World by Imagine Dragons", "The Wanderer by Dion", "Life Is A Highway by Rascal Flatts"]
-    },
-    quote: "Life begins at the end of your comfort zone.",
     coupon: "ADVENTURE20"
   }
 };
@@ -104,11 +75,25 @@ const personaDetails = {
 const QuizResults = () => {
   const location = useLocation();
   const { toast } = useToast();
+  const [randomPlaylist, setRandomPlaylist] = useState<any>(null);
+  const [randomQuote, setRandomQuote] = useState<string>("");
 
   // In a real app, this would come from the quiz completion
   // For now, using a default persona or URL param
   const personaName = new URLSearchParams(location.search).get('persona') || "The Hustler";
   const persona = personaDetails[personaName as keyof typeof personaDetails];
+
+  useEffect(() => {
+    // Get random playlist for this persona
+    const playlists = spotifyPlaylists[personaName as keyof typeof spotifyPlaylists] || [];
+    const randomPlaylistIndex = Math.floor(Math.random() * playlists.length);
+    setRandomPlaylist(playlists[randomPlaylistIndex]);
+    
+    // Get random quote for this persona
+    const quotes = motivationalQuotes[personaName as keyof typeof motivationalQuotes] || [];
+    const randomQuoteIndex = Math.floor(Math.random() * quotes.length);
+    setRandomQuote(quotes[randomQuoteIndex]);
+  }, [personaName]);
 
   const handleCopyCoupon = () => {
     navigator.clipboard.writeText(persona.coupon)
@@ -182,43 +167,48 @@ const QuizResults = () => {
 
             {/* Spotify Playlist */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-green-500 to-green-700 p-6 flex items-center">
-                  <Headphones className="h-8 w-8 text-white mr-3" />
-                  <h2 className="text-2xl font-bold text-white">Your Spotify Playlist</h2>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2">{persona.playlist.name}</h3>
-                  <p className="text-gray-700 mb-4">{persona.playlist.description}</p>
-                  <div className="bg-gray-100 rounded-lg p-4 mb-4">
-                    <h4 className="font-semibold mb-2 flex items-center">
-                      <Music className="h-4 w-4 mr-2" /> 
-                      Top Tracks
-                    </h4>
-                    <ul className="space-y-2">
-                      {persona.playlist.tracks.map((track, index) => (
-                        <li key={index} className="text-sm text-gray-700">{track}</li>
-                      ))}
-                    </ul>
+              {randomPlaylist && (
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                  <div className="bg-gradient-to-r from-green-500 to-green-700 p-6 flex items-center">
+                    <Spotify className="h-8 w-8 text-white mr-3" />
+                    <h2 className="text-2xl font-bold text-white">Your Spotify Playlist</h2>
                   </div>
-                  <Button className="bg-green-600 hover:bg-green-700 text-white">
-                    Open in Spotify
-                  </Button>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold mb-2">{randomPlaylist.name}</h3>
+                    <p className="text-gray-700 mb-4">{randomPlaylist.description}</p>
+                    <div className="bg-gray-100 rounded-lg p-4 mb-4">
+                      <h4 className="font-semibold mb-2 flex items-center">
+                        <Music className="h-4 w-4 mr-2" /> 
+                        Top Tracks
+                      </h4>
+                      <ul className="space-y-2">
+                        {randomPlaylist.tracks.map((track: string, index: number) => (
+                          <li key={index} className="text-sm text-gray-700">{track}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <Button className="bg-green-600 hover:bg-green-700 text-white">
+                      Open in Spotify
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Quote and Coupon */}
               <div className="space-y-8">
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                  <div className="bg-gradient-to-r from-amber-500 to-amber-700 p-6">
-                    <h2 className="text-2xl font-bold text-white">Your Motivation Quote</h2>
+                {randomQuote && (
+                  <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div className="bg-gradient-to-r from-amber-500 to-amber-700 p-6 flex items-center">
+                      <Quote className="h-8 w-8 text-white mr-3" />
+                      <h2 className="text-2xl font-bold text-white">Your Motivation Quote</h2>
+                    </div>
+                    <div className="p-6">
+                      <blockquote className="italic text-xl text-gray-700 border-l-4 border-amber-500 pl-4 py-2">
+                        "{randomQuote}"
+                      </blockquote>
+                    </div>
                   </div>
-                  <div className="p-6">
-                    <blockquote className="italic text-xl text-gray-700 border-l-4 border-amber-500 pl-4 py-2">
-                      "{persona.quote}"
-                    </blockquote>
-                  </div>
-                </div>
+                )}
 
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                   <div className="bg-gradient-to-r from-nescafe-red to-nescafe-brown p-6">
