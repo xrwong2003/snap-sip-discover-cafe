@@ -1,32 +1,32 @@
 
 import React from 'react';
-import { QrCode, MessageSquare, Award, Gift, Share2 } from "lucide-react";
+import { QrCode, MessageSquare, UserCircle, Gamepad2, Gift } from "lucide-react";
 
 const steps = [
   {
     icon: <QrCode className="w-10 h-10 text-nescafe-red" />,
-    title: "Scan",
-    description: "Users scan a QR code on any NESCAFÉ product (like a cup, sachet, or can) with their smartphone."
+    title: "Scan & Start",
+    description: "Scan the QR code on any NESCAFÉ product using your smartphone to launch an interactive AR experience."
   },
   {
     icon: <MessageSquare className="w-10 h-10 text-nescafe-red" />,
-    title: "Interact",
-    description: "This launches an AR experience where an AI chatbot acts as a digital barista, guiding users through a quick personality quiz."
+    title: "Meet Your Barista",
+    description: "An AI-powered digital barista guides you through a fun personality quiz to discover your unique Coffee Persona."
   },
   {
-    icon: <Award className="w-10 h-10 text-nescafe-red" />,
-    title: "Discover",
-    description: "Based on their answers, the AI reveals their Coffee Persona — like \"The Hustler,\" \"The Dreamer,\" or \"The Socialite.\""
+    icon: <UserCircle className="w-10 h-10 text-nescafe-red" />,
+    title: "Create & Customize",
+    description: "Design your Coffee Avatar based on your persona. Customize styles, unlock traits, and evolve it through daily app engagement."
+  },
+  {
+    icon: <Gamepad2 className="w-10 h-10 text-nescafe-red" />,
+    title: "Play & Earn",
+    description: "Keep your Daily Brew Streak, take mood quizzes, and play mini-games like Bean Hunt to earn Aroma Points and exclusive perks."
   },
   {
     icon: <Gift className="w-10 h-10 text-nescafe-red" />,
-    title: "Get Matched",
-    description: "Users receive tailored coffee recommendations plus extra perks like motivational quotes, Spotify playlists, and digital coupons."
-  },
-  {
-    icon: <Share2 className="w-10 h-10 text-nescafe-red" />,
-    title: "Share & Repeat",
-    description: "Users get a stylish, shareable Coffee Personality Card for social media, and can scan again daily for new rewards."
+    title: "Redeem & Repeat",
+    description: "Redeem points for rewards at AR kiosks or online, unlock new content, and share your Coffee Persona on social media. Come back daily for fresh experiences!"
   }
 ];
 
@@ -36,7 +36,7 @@ const HowItWorksSection = () => {
       <div className="section-container">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-nescafe-black mb-4">How It Works</h2>
-          <p className="text-lg text-nescafe-brown max-w-2xl mx-auto">Your journey to the perfect coffee experience in just a few simple steps</p>
+          <p className="text-lg text-nescafe-brown max-w-2xl mx-auto">Your personalized coffee adventure — one sip, one scan, one step at a time.</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
