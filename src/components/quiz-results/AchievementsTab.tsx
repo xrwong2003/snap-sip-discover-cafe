@@ -2,6 +2,14 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { 
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 
 interface AchievementsTabProps {
   persona: any;
@@ -22,6 +30,14 @@ interface AchievementsTabProps {
   }>>;
   achievementBadges: any[];
 }
+
+const leaderboardData = [
+  { rank: 1, name: "Coffee Master", persona: "The Zen Master", points: 1250, avatar: "🧘" },
+  { rank: 2, name: "Bean Hunter", persona: "The Adventurer", points: 980, avatar: "🌍" },
+  { rank: 3, name: "Brew Expert", persona: "The Hustler", points: 740, avatar: "💼" },
+  { rank: 4, name: "You", persona: "Your Persona", points: 350, avatar: "☕", highlight: true },
+  { rank: 5, name: "Sip Savvy", persona: "The Dreamer", points: 310, avatar: "✨" },
+];
 
 const AchievementsTab = ({ 
   persona, 
@@ -107,6 +123,49 @@ const AchievementsTab = ({
                 Save Avatar
               </Button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Leaderboard */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-6">
+          <h2 className="text-2xl font-bold text-white">Coffee Masters Leaderboard</h2>
+        </div>
+        <div className="p-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-16">Rank</TableHead>
+                <TableHead>Coffee Master</TableHead>
+                <TableHead>Persona</TableHead>
+                <TableHead className="text-right">Aroma Points</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {leaderboardData.map((user, index) => (
+                <TableRow key={index} className={user.highlight ? "bg-amber-50" : ""}>
+                  <TableCell className="font-medium">
+                    {user.rank}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <div className="mr-2 text-xl">{user.avatar}</div>
+                      <div className={user.highlight ? "font-bold text-amber-700" : ""}>
+                        {user.name}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{user.persona}</TableCell>
+                  <TableCell className="text-right font-semibold">
+                    {user.points}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div className="mt-4 text-center text-sm text-gray-500">
+            Keep engaging to earn more Aroma Points and climb the leaderboard!
           </div>
         </div>
       </div>

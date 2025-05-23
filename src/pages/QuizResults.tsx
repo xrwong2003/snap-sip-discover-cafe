@@ -1,12 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useToast } from "@/hooks/use-toast";
 import { 
-  spotifyPlaylists, 
-  motivationalQuotes, 
   coffeeFacts, 
   miniGames,
   moodCoffeeMatches,
@@ -19,6 +16,7 @@ import DailyActivitiesTab from '@/components/quiz-results/DailyActivitiesTab';
 import AchievementsTab from '@/components/quiz-results/AchievementsTab';
 import ResultsTabs from '@/components/quiz-results/ResultsTabs';
 import ShareResults from '@/components/quiz-results/ShareResults';
+import CoffeeAssistant from '@/components/CoffeeAssistant';
 
 // Sample data for coffee personas
 const personaDetails = {
@@ -87,8 +85,6 @@ const personaDetails = {
 const QuizResults = () => {
   const location = useLocation();
   const { toast } = useToast();
-  const [randomPlaylist, setRandomPlaylist] = useState<any>(null);
-  const [randomQuote, setRandomQuote] = useState<string>("");
   const [dailyFact, setDailyFact] = useState<string>("");
   const [currentStreak, setCurrentStreak] = useState<number>(0);
   const [avatarCustomization, setAvatarCustomization] = useState({
@@ -109,16 +105,6 @@ const QuizResults = () => {
   const persona = personaDetails[personaName as keyof typeof personaDetails];
 
   useEffect(() => {
-    // Get random playlist for this persona
-    const playlists = spotifyPlaylists[personaName as keyof typeof spotifyPlaylists] || [];
-    const randomPlaylistIndex = Math.floor(Math.random() * playlists.length);
-    setRandomPlaylist(playlists[randomPlaylistIndex]);
-    
-    // Get random quote for this persona
-    const quotes = motivationalQuotes[personaName as keyof typeof motivationalQuotes] || [];
-    const randomQuoteIndex = Math.floor(Math.random() * quotes.length);
-    setRandomQuote(quotes[randomQuoteIndex]);
-
     // Get daily coffee fact
     const factIndex = Math.floor(Math.random() * coffeeFacts.length);
     setDailyFact(coffeeFacts[factIndex]);
@@ -220,9 +206,7 @@ const QuizResults = () => {
             {activeTab === 'profile' && (
               <ProfileTab 
                 persona={persona} 
-                personaName={personaName} 
-                randomPlaylist={randomPlaylist} 
-                randomQuote={randomQuote}
+                personaName={personaName}
                 handleCopyCoupon={handleCopyCoupon}
               />
             )}
@@ -260,6 +244,9 @@ const QuizResults = () => {
         </section>
       </main>
       <Footer />
+      
+      {/* AI Coffee Assistant */}
+      <CoffeeAssistant />
     </div>
   );
 };

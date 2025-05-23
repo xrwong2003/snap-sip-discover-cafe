@@ -8,6 +8,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import QuizResults from "./pages/QuizResults";
 import NotFound from "./pages/NotFound";
+import CoffeeAssistant from "./components/CoffeeAssistant";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => {
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <CoffeeAssistant />
           <Toaster />
           <Sonner />
         </TooltipProvider>
