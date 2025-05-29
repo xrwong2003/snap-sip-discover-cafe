@@ -30,7 +30,6 @@ interface ProfileTabProps {
 
 const ProfileTab = ({ 
   persona, 
-  personaName,
   currentStreak,
   earnedBadges,
   avatarCustomization,
@@ -54,9 +53,6 @@ const ProfileTab = ({
           <div className="text-5xl">{persona.icon}</div>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Your Coffee Profile</h1>
-        <div className={`${persona.color} text-white font-bold py-2 px-6 rounded-full text-xl md:text-2xl inline-block mb-4`}>
-          {personaName}
-        </div>
         <p className="text-lg text-nescafe-brown max-w-xl mx-auto">{persona.description}</p>
       </div>
 
@@ -100,11 +96,11 @@ const ProfileTab = ({
                         value={avatarCustomization.personalityStyle}
                         onChange={(e) => setAvatarCustomization({...avatarCustomization, personalityStyle: e.target.value})}
                       >
-                        <option value="☕">☕ Coffee Cup</option>
-                        <option value="🥛">🥛 Milk Glass</option>
-                        <option value="🍫">🍫 Chocolate</option>
-                        <option value="🧊">🧊 Iced Coffee</option>
-                        <option value="🫘">🫘 Coffee Bean</option>
+                        <option value="☕">☕</option>
+                        <option value="🥛">🥛</option>
+                        <option value="🍫">🍫</option>
+                        <option value="🧊">🧊</option>
+                        <option value="🫘">🫘</option>
                       </select>
                     </div>
                     

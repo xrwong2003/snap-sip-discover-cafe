@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   Table,
   TableBody,
@@ -17,155 +16,130 @@ interface AchievementsTabProps {
   currentStreak: number;
   earnedBadges: string[];
   avatarCustomization: {
-    hairStyle: string;
-    facialFeature: string;
-    outfit: string;
-    accessory: string;
+    personalityStyle: string;
+    background: string;
+    accessories: string;
+    frameStyle: string;
+    avatarSize: string;
+    rotation: string;
+    animationStyle: string;
   };
   setAvatarCustomization: React.Dispatch<React.SetStateAction<{
-    hairStyle: string;
-    facialFeature: string;
-    outfit: string;
-    accessory: string;
+    personalityStyle: string;
+    background: string;
+    accessories: string;
+    frameStyle: string;
+    avatarSize: string;
+    rotation: string;
+    animationStyle: string;
   }>>;
   achievementBadges: any[];
 }
 
 const leaderboardData = [
-  { rank: 1, name: "Coffee Master", persona: "The Zen Master", points: 1250, avatar: "🧘" },
-  { rank: 2, name: "Bean Hunter", persona: "The Adventurer", points: 980, avatar: "🌍" },
-  { rank: 3, name: "Brew Expert", persona: "The Hustler", points: 740, avatar: "💼" },
-  { rank: 4, name: "You", persona: "Your Persona", points: 350, avatar: "☕", highlight: true },
-  { rank: 5, name: "Sip Savvy", persona: "The Dreamer", points: 310, avatar: "✨" },
+  { rank: 1, name: "CoffeeExplorer", level: "Lv.18 Master", streak: 15, achievements: 12, lastActive: "May 29", points: 2180 },
+  { rank: 2, name: "LatteLover", level: "Lv.16 Master", streak: 12, achievements: 10, lastActive: "May 22", points: 1980 },
+  { rank: 3, name: "EspressoPro", level: "Lv.14 Expert", streak: 9, achievements: 11, lastActive: "May 27", points: 1750 },
+  { rank: 4, name: "BeanMaster", level: "Lv.13 Expert", streak: 18, achievements: 9, lastActive: "May 22", points: 1650 },
+  { rank: 5, name: "You", level: "Lv.12 Expert", streak: 7, achievements: 8, lastActive: "May 25", points: 1250, highlight: true },
+  { rank: 6, name: "MochaQueen", level: "Lv.9 Pro", streak: 4, achievements: 5, lastActive: "May 27", points: 1180 },
+  { rank: 7, name: "FrappeFan", level: "Lv.8 Pro", streak: 3, achievements: 4, lastActive: "May 23", points: 980 },
+  { rank: 8, name: "ColdBrewKing", level: "Lv.7 Pro", streak: 2, achievements: 3, lastActive: "May 27", points: 850 },
 ];
 
 const AchievementsTab = ({ 
-  persona, 
-  personaName, 
   currentStreak, 
   earnedBadges, 
-  avatarCustomization,
-  setAvatarCustomization,
   achievementBadges
 }: AchievementsTabProps) => {
   return (
     <div className="space-y-8">
-      {/* Coffee Avatar Customization */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-6">
-          <h2 className="text-2xl font-bold text-white">Your Coffee Avatar</h2>
-        </div>
-        <div className="p-6">
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="md:w-1/3 flex justify-center">
-              <div className="relative">
-                <Avatar className="w-32 h-32 border-4 border-nescafe-red">
-                  <AvatarImage src={persona.image} />
-                  <AvatarFallback>{personaName[0]}</AvatarFallback>
-                </Avatar>
-                <div className="absolute -bottom-2 -right-2 bg-nescafe-red text-white rounded-full w-10 h-10 flex items-center justify-center text-lg">
-                  {persona.icon}
-                </div>
-              </div>
-            </div>
-            <div className="md:w-2/3">
-              <h3 className="text-xl font-bold mb-4">Customize Your Avatar</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Hair Style</label>
-                  <select 
-                    className="w-full p-2 border rounded-md"
-                    value={avatarCustomization.hairStyle}
-                    onChange={(e) => setAvatarCustomization({...avatarCustomization, hairStyle: e.target.value})}
-                  >
-                    <option value="short">Short</option>
-                    <option value="long">Long</option>
-                    <option value="curly">Curly</option>
-                    <option value="wavy">Wavy</option>
-                    <option value="bald">Bald</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Outfit</label>
-                  <select 
-                    className="w-full p-2 border rounded-md"
-                    value={avatarCustomization.outfit}
-                    onChange={(e) => setAvatarCustomization({...avatarCustomization, outfit: e.target.value})}
-                  >
-                    <option value="casual">Casual</option>
-                    <option value="business">Business</option>
-                    <option value="sporty">Sporty</option>
-                    <option value="creative">Creative</option>
-                    <option value="relaxed">Relaxed</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Accessory</label>
-                  <select 
-                    className="w-full p-2 border rounded-md"
-                    value={avatarCustomization.accessory}
-                    onChange={(e) => setAvatarCustomization({...avatarCustomization, accessory: e.target.value})}
-                  >
-                    <option value="coffee cup">Coffee Cup</option>
-                    <option value="laptop">Laptop</option>
-                    <option value="book">Book</option>
-                    <option value="headphones">Headphones</option>
-                    <option value="plant">Plant</option>
-                    <option value="none">None</option>
-                  </select>
-                </div>
-              </div>
-              
-              <Button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white">
-                Save Avatar
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Leaderboard */}
+      {/* Aroma Points Leaderboard */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-6">
-          <h2 className="text-2xl font-bold text-white">Coffee Masters Leaderboard</h2>
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            🏆 Aroma Points Leaderboard
+          </h2>
+          <p className="text-amber-100 mt-1">Top coffee explorers this month</p>
         </div>
         <div className="p-6">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-16">Rank</TableHead>
-                <TableHead>Coffee Master</TableHead>
-                <TableHead>Persona</TableHead>
-                <TableHead className="text-right">Aroma Points</TableHead>
+                <TableHead>Coffee Explorer</TableHead>
+                <TableHead>🔥 Streak</TableHead>
+                <TableHead>🏆 Achievements</TableHead>
+                <TableHead>📅 Last Active</TableHead>
+                <TableHead className="text-right">⭐ Aroma Points</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {leaderboardData.map((user, index) => (
-                <TableRow key={index} className={user.highlight ? "bg-amber-50" : ""}>
+                <TableRow key={index} className={user.highlight ? "bg-amber-50 border-amber-200" : ""}>
                   <TableCell className="font-medium">
-                    {user.rank}
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                      user.rank === 1 ? 'bg-yellow-500 text-white' : 
+                      user.rank === 2 ? 'bg-gray-400 text-white' : 
+                      user.rank === 3 ? 'bg-amber-600 text-white' : 
+                      user.highlight ? 'bg-amber-200 text-amber-800' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>
+                      #{user.rank}
+                    </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center">
-                      <div className="mr-2 text-xl">{user.avatar}</div>
-                      <div className={user.highlight ? "font-bold text-amber-700" : ""}>
-                        {user.name}
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                        👤
+                      </div>
+                      <div>
+                        <div className={`font-semibold ${user.highlight ? "text-amber-700" : ""}`}>
+                          {user.name}
+                        </div>
+                        <div className={`text-xs px-2 py-1 rounded-full inline-block ${
+                          user.level.includes('Master') ? 'bg-purple-100 text-purple-800' :
+                          user.level.includes('Expert') ? 'bg-orange-100 text-orange-800' :
+                          'bg-blue-100 text-blue-800'
+                        }`}>
+                          {user.level}
+                        </div>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>{user.persona}</TableCell>
-                  <TableCell className="text-right font-semibold">
-                    {user.points}
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <span className="text-orange-500">🔥</span>
+                      <span className="font-semibold">{user.streak}</span>
+                      <span className="text-xs text-gray-500">day streak</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <span className="text-yellow-500">🏆</span>
+                      <span className="font-semibold">{user.achievements}</span>
+                      <span className="text-xs text-gray-500">achievements</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-400">📅</span>
+                      <span className="text-sm">{user.lastActive}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <span className="text-yellow-500">⭐</span>
+                      <span className="font-bold text-lg">{user.points.toLocaleString()}</span>
+                      <span className="text-xs text-gray-500">Aroma Points</span>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-          <div className="mt-4 text-center text-sm text-gray-500">
-            Keep engaging to earn more Aroma Points and climb the leaderboard!
+          <div className="mt-6 text-center">
+            <p className="text-gray-500 mb-4">Earn more points by completing daily challenges, quizzes, and games!</p>
           </div>
         </div>
       </div>
@@ -194,40 +168,6 @@ const AchievementsTab = ({
                 </div>
               );
             })}
-          </div>
-        </div>
-      </div>
-
-      {/* Statistics */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-teal-500 to-teal-700 p-6">
-          <h2 className="text-2xl font-bold text-white">Your Coffee Journey</h2>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="border rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-teal-600">{currentStreak}</div>
-              <div className="text-sm text-gray-600">Day Streak</div>
-            </div>
-            <div className="border rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-teal-600">{earnedBadges.length}</div>
-              <div className="text-sm text-gray-600">Badges Earned</div>
-            </div>
-            <div className="border rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-teal-600">350</div>
-              <div className="text-sm text-gray-600">Aroma Points</div>
-            </div>
-            <div className="border rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-teal-600">5</div>
-              <div className="text-sm text-gray-600">Recipes Tried</div>
-            </div>
-          </div>
-          
-          <div className="text-center">
-            <p className="mb-4">Keep engaging with NESCAFÉ to grow your coffee journey!</p>
-            <Button className="bg-teal-500 hover:bg-teal-600 text-white">
-              View Full Stats
-            </Button>
           </div>
         </div>
       </div>

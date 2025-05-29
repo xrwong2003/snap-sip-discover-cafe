@@ -16,6 +16,7 @@ import DailyActivitiesTab from '@/components/quiz-results/DailyActivitiesTab';
 import AchievementsTab from '@/components/quiz-results/AchievementsTab';
 import ResultsTabs from '@/components/quiz-results/ResultsTabs';
 import CoffeeAssistant from '@/components/CoffeeAssistant';
+import WelcomePage from '@/components/WelcomePage';
 
 // Sample data for coffee personas
 const personaDetails = {
@@ -35,6 +36,7 @@ const personaDetails = {
 
 const Index = () => {
   const { toast } = useToast();
+  const [showWelcome, setShowWelcome] = useState(true);
   const [dailyFact, setDailyFact] = useState<string>("");
   const [currentStreak, setCurrentStreak] = useState<number>(0);
   const [avatarCustomization, setAvatarCustomization] = useState({
@@ -111,6 +113,14 @@ const Index = () => {
     });
     // In a real implementation, this would launch the game interface
   };
+
+  const handleGetStarted = () => {
+    setShowWelcome(false);
+  };
+
+  if (showWelcome) {
+    return <WelcomePage onGetStarted={handleGetStarted} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
