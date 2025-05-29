@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface DailyActivitiesTabProps {
   currentStreak: number;
@@ -23,82 +24,157 @@ const DailyActivitiesTab = ({
   handlePlayGame,
   moodCoffeeMatches
 }: DailyActivitiesTabProps) => {
+  const { toast } = useToast();
+  const [weeklyStreak, setWeeklyStreak] = useState([true, true, false, true, false, false, false]); // Sun-Sat
+  const [currentQuizQuestion, setCurrentQuizQuestion] = useState(0);
+  const [moodQuizAnswers, setMoodQuizAnswers] = useState<string[]>([]);
+  const [factQuizAnswers, setFactQuizAnswers] = useState<string[]>([]);
+
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const moodQuizQuestions = [
+    { question: "How energetic do you feel today?", options: ["Very Low", "Low", "Medium", "High", "Very High"] },
+    { question: "What's your current stress level?", options: ["Zen", "Calm", "Moderate", "Stressed", "Overwhelmed"] },
+    { question: "How social are you feeling?", options: ["Hermit Mode", "Quiet", "Normal", "Social", "Party Ready"] },
+    { question: "What's your pace today?", options: ["Slow & Steady", "Relaxed", "Normal", "Fast", "Lightning Speed"] },
+    { question: "How adventurous are you feeling?", options: ["Safe Zone", "Cautious", "Open", "Adventurous", "Daredevil"] }
+  ];
+
+  const factQuizQuestions = [
+    { question: "Which country produces the most coffee?", options: ["Colombia", "Brazil", "Ethiopia", "Vietnam"], correct: 1 },
+    { question: "What does 'espresso' mean in Italian?", options: ["Strong", "Fast", "Pressed out", "Dark"], correct: 2 },
+    { question: "How many coffee beans are in one coffee cherry?", options: ["1", "2", "3", "4"], correct: 1 },
+    { question: "What is the most expensive coffee in the world?", options: ["Blue Mountain", "Kopi Luwak", "Black Ivory", "Geisha"], correct: 2 },
+    { question: "When was instant coffee invented?", options: ["1901", "1910", "1920", "1930"], correct: 0 }
+  ];
+
+  const handleBrewToday = () => {
+    toast({
+      title: "Brewed Today!",
+      description: "Great job maintaining your streak! +10 Aroma Points earned.",
+    });
+  };
+
+  const handleMoodQuizAnswer = (answer: string) => {
+    const newAnswers = [...moodQuizAnswers, answer];
+    setMoodQuizAnswers(newAnswers);
+    
+    if (currentQuizQuestion < moodQuizQuestions.length - 1) {
+      setCurrentQuizQuestion(currentQuizQuestion + 1);
+    } else {
+      // Quiz completed
+      toast({
+        title: "Coffee Mood Quiz Complete!",
+        description: "Your mood has been analyzed. Check your coffee recommendation! +25 Aroma Points earned.",
+      });
+      setCurrentQuizQuestion(0);
+      setMoodQuizAnswers([]);
+    }
+  };
+
+  const handleFactQuizAnswer = (answerIndex: number) => {
+    const newAnswers = [...factQuizAnswers, answerIndex.toString()];
+    setFactQuizAnswers(newAnswers);
+    
+    const isCorrect = answerIndex === factQuizQuestions[currentQuizQuestion].correct;
+    
+    if (newAnswers.length < factQuizQuestions.length) {
+      setCurrentQuizQuestion((prev) => (prev + 1) % factQuizQuestions.length);
+    } else {
+      // Quiz completed
+      const correctAnswers = newAnswers.filter((answer, index) => 
+        parseInt(answer) === factQuizQuestions[index].correct
+      ).length;
+      
+      toast({
+        title: "Coffee Knowledge Quiz Complete!",
+        description: `You got ${correctAnswers}/5 correct! +${correctAnswers * 5} Aroma Points earned.`,
+      });
+      setFactQuizAnswers([]);
+      setCurrentQuizQuestion(0);
+    }
+  };
+
+  const playableGames = [
+    { name: "Bean Hunt", difficulty: "Easy", time: "2 min", points: 15, description: "Find hidden coffee beans in AR!" },
+    { name: "Pod Match", difficulty: "Medium", time: "3 min", points: 20, description: "Match coffee pods in this memory game!" },
+    { name: "Brew Master", difficulty: "Hard", time: "5 min", points: 30, description: "Master the perfect brewing technique!" }
+  ];
+
   return (
     <div className="space-y-8">
-      {/* Daily Streak */}
+      {/* Daily Brew Streak */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-amber-500 to-amber-700 p-6">
           <h2 className="text-2xl font-bold text-white">Daily Brew Streak</h2>
         </div>
         <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <span className="text-lg">Your Current Streak</span>
-            <span className="text-3xl font-bold text-amber-600">{currentStreak} days</span>
-          </div>
-          
-          <div className="w-full bg-gray-200 rounded-full h-4 mb-6">
-            <div 
-              className="bg-amber-500 h-4 rounded-full transition-all duration-500"
-              style={{ width: `${Math.min(currentStreak * 10, 100)}%` }}
-            ></div>
-          </div>
-          
-          <div className="text-center">
-            {currentStreak < 7 ? (
-              <p>Keep your streak going! Earn a special badge at 7 days.</p>
-            ) : (
-              <p>Amazing streak! You're earning bonus Aroma Points daily.</p>
-            )}
-            <Button className="mt-4 bg-amber-500 hover:bg-amber-600 text-white">
-              Check In Today
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Daily Coffee Fact */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6">
-          <h2 className="text-2xl font-bold text-white">Daily Coffee Fact</h2>
-        </div>
-        <div className="p-6">
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
-            <p className="text-lg">{dailyFact}</p>
-          </div>
-          <div className="flex justify-between items-center">
-            <span>+5 Aroma Points for reading</span>
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-              Share Fact
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mood Coffee Match */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-purple-500 to-purple-700 p-6">
-          <h2 className="text-2xl font-bold text-white">Today's Mood Coffee Match</h2>
-        </div>
-        <div className="p-6">
-          <div className="mb-6">
-            <h3 className="font-semibold mb-2">How are you feeling today?</h3>
-            <div className="flex flex-wrap gap-2">
-              {Object.keys(moodCoffeeMatches).map(mood => (
-                <Button 
-                  key={mood} 
-                  variant={todayMood === mood ? "default" : "outline"}
-                  className={todayMood === mood ? "bg-purple-500 hover:bg-purple-600" : ""}
-                  onClick={() => handleUpdateMood(mood)}
-                >
-                  {mood}
-                </Button>
+          <div className="flex justify-center mb-6">
+            <div className="flex gap-2">
+              {daysOfWeek.map((day, index) => (
+                <div key={day} className="text-center">
+                  <div className="text-xs text-gray-600 mb-1">{day}</div>
+                  <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center ${weeklyStreak[index] ? 'bg-amber-500 border-amber-500 text-white' : 'bg-gray-100 border-gray-300'}`}>
+                    {weeklyStreak[index] ? '☕' : '○'}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
           
+          <div className="text-center">
+            <div className="text-3xl font-bold text-amber-600 mb-2">{currentStreak} days</div>
+            <p className="mb-4">Keep your streak alive!</p>
+            <Button 
+              className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3 text-lg"
+              onClick={handleBrewToday}
+            >
+              Brew Today
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Coffee Mood Quiz */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-purple-500 to-purple-700 p-6">
+          <h2 className="text-2xl font-bold text-white">Coffee Mood Quiz</h2>
+        </div>
+        <div className="p-6">
+          {moodQuizAnswers.length < moodQuizQuestions.length ? (
+            <div>
+              <div className="mb-4">
+                <div className="text-sm text-gray-600 mb-2">Question {currentQuizQuestion + 1} of {moodQuizQuestions.length}</div>
+                <h3 className="text-lg font-semibold mb-4">{moodQuizQuestions[currentQuizQuestion].question}</h3>
+                <div className="space-y-2">
+                  {moodQuizQuestions[currentQuizQuestion].options.map((option, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => handleMoodQuizAnswer(option)}
+                    >
+                      {option}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="mb-4">Take today's mood quiz to get your personalized coffee recommendation!</p>
+              <Button 
+                className="bg-purple-500 hover:bg-purple-600 text-white"
+                onClick={() => {setCurrentQuizQuestion(0); setMoodQuizAnswers([]);}}
+              >
+                Start Mood Quiz
+              </Button>
+            </div>
+          )}
+          
           {moodRecipe && (
-            <div className="border rounded-lg p-4">
-              <h4 className="font-bold text-lg mb-2">Your {todayMood} Coffee: {moodRecipe.recipe}</h4>
+            <div className="mt-6 border rounded-lg p-4 bg-purple-50">
+              <h4 className="font-bold text-lg mb-2">Your Mood Coffee: {moodRecipe.recipe}</h4>
               <p className="text-sm mb-4">{moodRecipe.description}</p>
               <div className="mb-4">
                 <h5 className="font-semibold mb-1">Ingredients:</h5>
@@ -108,47 +184,83 @@ const DailyActivitiesTab = ({
                   ))}
                 </ul>
               </div>
-              <p className="text-xs text-purple-600">Try this recipe and earn {moodRecipe.aromaPoints} Aroma Points!</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Daily Mini-Game */}
-      {todayGame && (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-green-500 to-green-700 p-6">
-            <h2 className="text-2xl font-bold text-white">Today's Mini-Game</h2>
-          </div>
-          <div className="p-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="md:w-1/3">
-                <img 
-                  src={todayGame.imageUrl} 
-                  alt={todayGame.name} 
-                  className="rounded-lg w-full h-auto object-cover"
-                />
-              </div>
-              <div className="md:w-2/3">
-                <h3 className="text-xl font-bold mb-2">{todayGame.name}</h3>
-                <div className="flex items-center mb-2">
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                    {todayGame.difficulty.toUpperCase()}
-                  </span>
-                  <span className="ml-2 text-sm">Earn up to {todayGame.rewardPoints} Aroma Points</span>
+      {/* Daily Coffee Fact Quiz */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-700 p-6">
+          <h2 className="text-2xl font-bold text-white">Daily Coffee Fact Quiz</h2>
+        </div>
+        <div className="p-6">
+          {factQuizAnswers.length < factQuizQuestions.length ? (
+            <div>
+              <div className="mb-4">
+                <div className="text-sm text-gray-600 mb-2">Question {factQuizAnswers.length + 1} of {factQuizQuestions.length}</div>
+                <h3 className="text-lg font-semibold mb-4">{factQuizQuestions[currentQuizQuestion].question}</h3>
+                <div className="space-y-2">
+                  {factQuizQuestions[currentQuizQuestion].options.map((option, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => handleFactQuizAnswer(index)}
+                    >
+                      {option}
+                    </Button>
+                  ))}
                 </div>
-                <p className="text-gray-700 mb-4">{todayGame.description}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="mb-4">Test your coffee knowledge with today's quiz!</p>
+              <Button 
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+                onClick={() => {setCurrentQuizQuestion(0); setFactQuizAnswers([]);}}
+              >
+                Start Knowledge Quiz
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Today's Mini Games */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-green-500 to-green-700 p-6">
+          <h2 className="text-2xl font-bold text-white">Today's Mini Games</h2>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {playableGames.map((game, index) => (
+              <div key={index} className="border rounded-lg p-4 text-center">
+                <h3 className="font-bold text-lg mb-2">{game.name}</h3>
+                <div className="flex justify-center gap-2 mb-2">
+                  <span className={`text-xs px-2 py-1 rounded ${game.difficulty === 'Easy' ? 'bg-green-100 text-green-800' : game.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
+                    {game.difficulty}
+                  </span>
+                  <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-800">
+                    {game.time}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">{game.description}</p>
+                <div className="text-sm font-semibold text-green-600 mb-3">
+                  +{game.points} Aroma Points
+                </div>
                 <Button 
-                  className="bg-green-500 hover:bg-green-600 text-white"
-                  onClick={handlePlayGame}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  onClick={() => toast({ title: `Starting ${game.name}`, description: `Get ready to earn ${game.points} points!` })}
                 >
                   Play Now
                 </Button>
               </div>
-            </div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
