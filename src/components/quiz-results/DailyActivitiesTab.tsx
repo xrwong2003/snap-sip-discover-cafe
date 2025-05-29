@@ -1,7 +1,9 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import BeanHuntGame from '@/components/games/BeanHuntGame';
+import PodMatchGame from '@/components/games/PodMatchGame';
+import BrewMasterGame from '@/components/games/BrewMasterGame';
 
 interface DailyActivitiesTabProps {
   currentStreak: number;
@@ -31,6 +33,9 @@ const DailyActivitiesTab = ({
   const [factQuizAnswers, setFactQuizAnswers] = useState<string[]>([]);
   const [hasBrewedToday, setHasBrewedToday] = useState(false);
   const [currentMoodQuizResult, setCurrentMoodQuizResult] = useState<string>("");
+  
+  // Game states
+  const [activeGame, setActiveGame] = useState<string | null>(null);
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -139,6 +144,7 @@ const DailyActivitiesTab = ({
 
   const playableGames = [
     { 
+      id: 'bean-hunt',
       name: "Bean Hunt", 
       difficulty: "Easy", 
       time: "2 min", 
@@ -148,6 +154,7 @@ const DailyActivitiesTab = ({
       color: "bg-orange-500"
     },
     { 
+      id: 'pod-match',
       name: "Pod Match", 
       difficulty: "Medium", 
       time: "3 min", 
@@ -157,6 +164,7 @@ const DailyActivitiesTab = ({
       color: "bg-green-500"
     },
     { 
+      id: 'brew-master',
       name: "Brew Master", 
       difficulty: "Hard", 
       time: "5 min", 
@@ -167,8 +175,32 @@ const DailyActivitiesTab = ({
     }
   ];
 
+  const handleStartGame = (gameId: string) => {
+    setActiveGame(gameId);
+  };
+
+  const handleGameEnd = (points: number) => {
+    // Handle points earned from game
+    console.log(`Game ended, earned ${points} points`);
+  };
+
+  const handleCloseGame = () => {
+    setActiveGame(null);
+  };
+
   return (
     <div className="space-y-8">
+      {/* Game Components */}
+      {activeGame === 'bean-hunt' && (
+        <BeanHuntGame onGameEnd={handleGameEnd} onClose={handleCloseGame} />
+      )}
+      {activeGame === 'pod-match' && (
+        <PodMatchGame onGameEnd={handleGameEnd} onClose={handleCloseGame} />
+      )}
+      {activeGame === 'brew-master' && (
+        <BrewMasterGame onGameEnd={handleGameEnd} onClose={handleCloseGame} />
+      )}
+
       {/* Daily Brew Streak */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-amber-500 to-amber-700 p-6">
@@ -383,10 +415,7 @@ const DailyActivitiesTab = ({
                 </div>
                 <Button 
                   className={`${game.color} hover:opacity-90 text-white px-6`}
-                  onClick={() => toast({ 
-                    title: `Starting ${game.name}`, 
-                    description: `Get ready to earn ${game.points} points!` 
-                  })}
+                  onClick={() => handleStartGame(game.id)}
                 >
                   ▶ Play Now
                 </Button>
