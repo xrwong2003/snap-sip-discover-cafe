@@ -88,10 +88,13 @@ const QuizResults = () => {
   const [dailyFact, setDailyFact] = useState<string>("");
   const [currentStreak, setCurrentStreak] = useState<number>(0);
   const [avatarCustomization, setAvatarCustomization] = useState({
-    hairStyle: "short",
-    facialFeature: "none",
-    outfit: "casual",
-    accessory: "coffee cup"
+    personalityStyle: "☕",
+    background: "cream",
+    accessories: "none",
+    frameStyle: "rounded",
+    avatarSize: "medium",
+    rotation: "0",
+    animationStyle: "none"
   });
   const [todayMood, setTodayMood] = useState<string>("Energized");
   const [moodRecipe, setMoodRecipe] = useState<any>(null);
@@ -207,7 +210,10 @@ const QuizResults = () => {
               <ProfileTab 
                 persona={persona} 
                 personaName={personaName}
-                handleCopyCoupon={handleCopyCoupon}
+                currentStreak={currentStreak}
+                earnedBadges={earnedBadges}
+                avatarCustomization={avatarCustomization}
+                setAvatarCustomization={setAvatarCustomization}
               />
             )}
 
