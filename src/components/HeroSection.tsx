@@ -1,9 +1,11 @@
 
-import React from 'react';
-import { Button } from "@/components/ui/button";
-import { QrCode } from "lucide-react";
+import React, { useState } from 'react';
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const HeroSection = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
     <section className="bg-gradient-to-br from-nescafe-cream to-white relative overflow-hidden">
       <div className="bg-coffee-texture absolute inset-0 opacity-30"></div>
@@ -15,10 +17,18 @@ const HeroSection = () => {
           <p className="text-xl md:text-2xl text-nescafe-brown opacity-90 mb-8">
             Discover your coffee personality and perfect NESCAFÉ match through our AI-powered AR experience
           </p>
-          <Button className="button-scan group">
-            <QrCode className="mr-2 group-hover:animate-spin-slow" />
-            Scan a Pack to Start
-          </Button>
+          
+          {/* Search Bar */}
+          <div className="relative max-w-md mx-auto mb-8">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-nescafe-brown h-5 w-5" />
+            <Input
+              type="text"
+              placeholder="Search cafes by name or location..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 py-3 text-lg border-2 border-nescafe-brown/20 focus:border-nescafe-red rounded-full"
+            />
+          </div>
           
           <div className="mt-12">
             <div className="flex items-center justify-center space-x-4">
