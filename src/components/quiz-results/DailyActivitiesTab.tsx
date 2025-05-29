@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import BeanHuntGame from '@/components/games/BeanHuntGame';
@@ -27,26 +28,56 @@ const DailyActivitiesTab = ({
   moodCoffeeMatches
 }: DailyActivitiesTabProps) => {
   const { toast } = useToast();
-  const [weeklyStreak, setWeeklyStreak] = useState([true, true, false, true, true, false, false]); // Sun-Sat
-  const [currentQuizQuestion, setCurrentQuizQuestion] = useState(0);
-  const [moodQuizAnswers, setMoodQuizAnswers] = useState<string[]>([]);
-  const [factQuizAnswers, setFactQuizAnswers] = useState<string[]>([]);
+  
+  // Daily Brew Streak State
+  const [weeklyStreak, setWeeklyStreak] = useState([true, true, false, true, true, false, false]); 
   const [hasBrewedToday, setHasBrewedToday] = useState(false);
-  const [currentMoodQuizResult, setCurrentMoodQuizResult] = useState<string>("");
+  
+  // Coffee Mood Quiz State
+  const [moodQuizStep, setMoodQuizStep] = useState(0);
+  const [moodQuizAnswers, setMoodQuizAnswers] = useState<string[]>([]);
+  const [moodQuizCompleted, setMoodQuizCompleted] = useState(false);
+  const [moodQuizLocked, setMoodQuizLocked] = useState(false);
+  const [detectedMood, setDetectedMood] = useState("");
+  const [recommendedRecipe, setRecommendedRecipe] = useState<any>(null);
+  
+  // Daily Coffee Fact Quiz State
+  const [factQuizStep, setFactQuizStep] = useState(0);
+  const [factQuizAnswers, setFactQuizAnswers] = useState<number[]>([]);
+  const [factQuizCompleted, setFactQuizCompleted] = useState(false);
+  const [factQuizLocked, setFactQuizLocked] = useState(false);
+  const [factQuizScore, setFactQuizScore] = useState(0);
   
   // Game states
   const [activeGame, setActiveGame] = useState<string | null>(null);
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+  // Lifestyle/mood quiz questions
   const moodQuizQuestions = [
-    { question: "How are you feeling today?", options: ["Energetic", "Relaxed", "Focused", "Creative", "Social"] },
-    { question: "What's your energy level?", options: ["Very Low", "Low", "Medium", "High", "Very High"] },
-    { question: "How social are you feeling?", options: ["Want to be alone", "Small group", "Party ready", "Online hangout", "Big gathering"] },
-    { question: "What's your pace today?", options: ["Slow morning", "Steady rhythm", "Fast-paced", "Rush mode", "Chill vibes"] },
-    { question: "What flavor profile appeals to you?", options: ["Rich & bold", "Smooth & creamy", "Sweet & indulgent", "Fresh & light", "Exotic & adventurous"] }
+    { 
+      question: "How would you describe your energy level today?", 
+      options: ["Low and sleepy", "Calm and steady", "Energetic and focused", "High and buzzing", "Tired but motivated"] 
+    },
+    { 
+      question: "What's your ideal way to spend the morning?", 
+      options: ["Slow and peaceful", "Quick and efficient", "Creative and inspiring", "Social and engaging", "Active and dynamic"] 
+    },
+    { 
+      question: "How do you prefer to work?", 
+      options: ["In quiet solitude", "With background ambiance", "In bursts of intensity", "Collaboratively with others", "With music and movement"] 
+    },
+    { 
+      question: "What flavor profile appeals to you right now?", 
+      options: ["Rich and bold", "Smooth and creamy", "Sweet and comforting", "Fresh and light", "Complex and adventurous"] 
+    },
+    { 
+      question: "What's your current mood?", 
+      options: ["Relaxed and content", "Focused and determined", "Creative and inspired", "Social and cheerful", "Adventurous and bold"] 
+    }
   ];
 
+  // Coffee fact quiz questions
   const factQuizQuestions = [
     { 
       question: "Which country produces the most coffee?", 
@@ -80,68 +111,7 @@ const DailyActivitiesTab = ({
     }
   ];
 
-  const handleBrewToday = () => {
-    setHasBrewedToday(true);
-    toast({
-      title: "Brewed Today! ☕",
-      description: "+50 Aroma Points • Keep your streak alive!",
-    });
-  };
-
-  const handleMoodQuizAnswer = (answer: string) => {
-    const newAnswers = [...moodQuizAnswers, answer];
-    setMoodQuizAnswers(newAnswers);
-    
-    if (currentQuizQuestion < moodQuizQuestions.length - 1) {
-      setCurrentQuizQuestion(currentQuizQuestion + 1);
-    } else {
-      // Quiz completed - analyze mood
-      setCurrentMoodQuizResult("Feeling Relaxed");
-      toast({
-        title: "Coffee Mood Quiz Complete!",
-        description: "Perfect match found! +25 Aroma Points earned.",
-      });
-      setCurrentQuizQuestion(0);
-      setMoodQuizAnswers([]);
-    }
-  };
-
-  const handleFactQuizAnswer = (answerIndex: number) => {
-    const currentQuestion = factQuizQuestions[factQuizAnswers.length];
-    const isCorrect = answerIndex === currentQuestion.correct;
-    
-    const newAnswers = [...factQuizAnswers, answerIndex.toString()];
-    setFactQuizAnswers(newAnswers);
-    
-    // Show explanation
-    toast({
-      title: isCorrect ? "Correct! +10 Aroma Points" : "Incorrect",
-      description: currentQuestion.explanation,
-      duration: 4000,
-    });
-    
-    if (newAnswers.length < factQuizQuestions.length) {
-      setTimeout(() => {
-        setCurrentQuizQuestion((prev) => (prev + 1) % factQuizQuestions.length);
-      }, 2000);
-    } else {
-      // Quiz completed
-      const correctAnswers = newAnswers.filter((answer, index) => 
-        parseInt(answer) === factQuizQuestions[index].correct
-      ).length;
-      
-      setTimeout(() => {
-        toast({
-          title: "Quiz Completed!",
-          description: `You got ${correctAnswers}/5 correct! Come back tomorrow for a new quiz. Total earned: +${correctAnswers * 10} Aroma Points.`,
-          duration: 5000,
-        });
-        setFactQuizAnswers([]);
-        setCurrentQuizQuestion(0);
-      }, 2000);
-    }
-  };
-
+  // Available games
   const playableGames = [
     { 
       id: 'bean-hunt',
@@ -175,17 +145,174 @@ const DailyActivitiesTab = ({
     }
   ];
 
+  // Global scroll reset function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Check daily locks on component mount
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const moodQuizDate = localStorage.getItem('moodQuizDate');
+    const factQuizDate = localStorage.getItem('factQuizDate');
+    
+    if (moodQuizDate === today) {
+      setMoodQuizLocked(true);
+      setMoodQuizCompleted(true);
+    }
+    
+    if (factQuizDate === today) {
+      setFactQuizLocked(true);
+      setFactQuizCompleted(true);
+    }
+  }, []);
+
+  // Daily Brew Streak Functions
+  const handleBrewToday = () => {
+    setHasBrewedToday(true);
+    
+    // Update today's status in weekly streak (assuming today is index 4 - Thursday)
+    const updatedStreak = [...weeklyStreak];
+    updatedStreak[4] = true; // Mark today as brewed
+    setWeeklyStreak(updatedStreak);
+    
+    toast({
+      title: "☑ Brewed Today!",
+      description: "+50 Aroma Points • Keep your streak alive!",
+    });
+  };
+
+  // Mood Quiz Functions
+  const handleMoodQuizAnswer = (answer: string) => {
+    const newAnswers = [...moodQuizAnswers, answer];
+    setMoodQuizAnswers(newAnswers);
+    
+    if (moodQuizStep < moodQuizQuestions.length - 1) {
+      setMoodQuizStep(moodQuizStep + 1);
+      scrollToTop();
+    } else {
+      // Quiz completed - analyze mood
+      analyzeMoodResults(newAnswers);
+    }
+  };
+
+  const analyzeMoodResults = (answers: string[]) => {
+    // Simple mood analysis based on answers
+    const moodMap = {
+      "relaxed": { emoji: "😌", mood: "Feeling Relaxed", recipe: "NESCAFÉ Smooth Latte" },
+      "focused": { emoji: "🧠", mood: "Feeling Focused", recipe: "NESCAFÉ Gold Americano" },
+      "energetic": { emoji: "⚡", mood: "Feeling Energetic", recipe: "NESCAFÉ 3in1 Original" },
+      "creative": { emoji: "🎨", mood: "Feeling Creative", recipe: "NESCAFÉ Caramel Macchiato" },
+      "social": { emoji: "😊", mood: "Feeling Social", recipe: "NESCAFÉ Iced Coffee" }
+    };
+    
+    // Determine mood based on answers (simplified logic)
+    let dominantMood = "relaxed";
+    if (answers.some(a => a.includes("energetic") || a.includes("focused"))) dominantMood = "focused";
+    if (answers.some(a => a.includes("creative") || a.includes("inspiring"))) dominantMood = "creative";
+    if (answers.some(a => a.includes("social") || a.includes("engaging"))) dominantMood = "social";
+    
+    const result = moodMap[dominantMood as keyof typeof moodMap];
+    setDetectedMood(result.mood);
+    setRecommendedRecipe({
+      name: result.recipe,
+      description: "A perfect match for your current mood and energy level.",
+      emoji: result.emoji
+    });
+    
+    setMoodQuizCompleted(true);
+    
+    // Lock quiz for today
+    const today = new Date().toDateString();
+    localStorage.setItem('moodQuizDate', today);
+    setMoodQuizLocked(true);
+    
+    toast({
+      title: "Coffee Mood Quiz Complete!",
+      description: "Perfect match found! +25 Aroma Points earned.",
+    });
+    
+    scrollToTop();
+  };
+
+  const resetMoodQuiz = () => {
+    setMoodQuizStep(0);
+    setMoodQuizAnswers([]);
+    setMoodQuizCompleted(false);
+    scrollToTop();
+  };
+
+  // Fact Quiz Functions
+  const handleFactQuizAnswer = (answerIndex: number) => {
+    const currentQuestion = factQuizQuestions[factQuizStep];
+    const isCorrect = answerIndex === currentQuestion.correct;
+    
+    const newAnswers = [...factQuizAnswers, answerIndex];
+    setFactQuizAnswers(newAnswers);
+    
+    if (isCorrect) {
+      setFactQuizScore(factQuizScore + 1);
+    }
+    
+    // Show explanation
+    toast({
+      title: isCorrect ? "Correct! +10 Aroma Points" : "Incorrect",
+      description: currentQuestion.explanation,
+      duration: 4000,
+    });
+    
+    if (factQuizStep < factQuizQuestions.length - 1) {
+      setTimeout(() => {
+        setFactQuizStep(factQuizStep + 1);
+        scrollToTop();
+      }, 2000);
+    } else {
+      // Quiz completed
+      setTimeout(() => {
+        setFactQuizCompleted(true);
+        
+        // Lock quiz for today
+        const today = new Date().toDateString();
+        localStorage.setItem('factQuizDate', today);
+        setFactQuizLocked(true);
+        
+        toast({
+          title: "✔️ Quiz Completed!",
+          description: `You got ${factQuizScore + (isCorrect ? 1 : 0)}/5 correct! Come back tomorrow for a new quiz. Total earned: +${(factQuizScore + (isCorrect ? 1 : 0)) * 10} Aroma Points.`,
+          duration: 5000,
+        });
+        
+        scrollToTop();
+      }, 2000);
+    }
+  };
+
+  const resetFactQuiz = () => {
+    setFactQuizStep(0);
+    setFactQuizAnswers([]);
+    setFactQuizCompleted(false);
+    setFactQuizScore(0);
+    scrollToTop();
+  };
+
+  // Game Functions
   const handleStartGame = (gameId: string) => {
     setActiveGame(gameId);
   };
 
   const handleGameEnd = (points: number) => {
-    // Handle points earned from game
     console.log(`Game ended, earned ${points} points`);
   };
 
   const handleCloseGame = () => {
     setActiveGame(null);
+  };
+
+  const handleTryRecipe = () => {
+    toast({
+      title: "Recipe Tried!",
+      description: "+25 Aroma Points earned! Great choice for your mood.",
+    });
   };
 
   return (
@@ -211,17 +338,18 @@ const DailyActivitiesTab = ({
             <div className="flex gap-2">
               {daysOfWeek.map((day, index) => {
                 const isToday = index === 4; // Thursday as example
+                const isBrewedDay = weeklyStreak[index];
                 return (
                   <div key={day} className="text-center">
                     <div className="text-xs text-gray-600 mb-1">{day}</div>
                     <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center ${
-                      weeklyStreak[index] 
-                        ? isToday 
-                          ? 'bg-orange-500 border-orange-500 text-white shadow-lg' 
-                          : 'bg-amber-500 border-amber-500 text-white'
-                        : 'bg-gray-100 border-gray-300'
+                      isToday && hasBrewedToday
+                        ? 'bg-orange-600 border-orange-600 text-white shadow-lg' // Dark orange for today brewed
+                        : isBrewedDay 
+                          ? 'bg-orange-400 border-orange-400 text-white' // Light orange for past brewed days
+                          : 'bg-gray-200 border-gray-300 text-gray-400' // Gray for unbrewed/future
                     }`}>
-                      {weeklyStreak[index] ? '☕' : '○'}
+                      {isBrewedDay || (isToday && hasBrewedToday) ? '☕' : '○'}
                     </div>
                   </div>
                 );
@@ -262,13 +390,13 @@ const DailyActivitiesTab = ({
           <p className="text-purple-100">Personalized Match</p>
         </div>
         <div className="p-6">
-          {currentMoodQuizResult ? (
+          {moodQuizLocked && moodQuizCompleted ? (
             <div className="text-center">
               <div className="mb-6">
                 <div className="flex items-center justify-center gap-3 mb-4">
-                  <div className="text-4xl">😌</div>
+                  <div className="text-4xl">{recommendedRecipe?.emoji || '😌'}</div>
                   <div>
-                    <h3 className="text-xl font-bold">Feeling Relaxed</h3>
+                    <h3 className="text-xl font-bold">{detectedMood}</h3>
                     <p className="text-gray-600">Perfect match found</p>
                   </div>
                 </div>
@@ -280,36 +408,75 @@ const DailyActivitiesTab = ({
                     ☕
                   </div>
                   <div className="text-left">
-                    <h4 className="font-bold text-lg mb-1">NESCAFÉ Smooth Latte</h4>
-                    <p className="text-gray-600 mb-3">A creamy, soothing latte that complements your calm state while providing gentle warmth.</p>
+                    <h4 className="font-bold text-lg mb-1">{recommendedRecipe?.name}</h4>
+                    <p className="text-gray-600 mb-3">{recommendedRecipe?.description}</p>
                     <div className="flex gap-2">
-                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Smooth</span>
-                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Comforting</span>
-                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Balanced</span>
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Perfect Match</span>
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Mood-Based</span>
                     </div>
                   </div>
                 </div>
                 
-                <Button className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white">
+                <Button 
+                  className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white"
+                  onClick={handleTryRecipe}
+                >
+                  Try This Recipe (+25 Points)
+                </Button>
+              </div>
+              
+              <p className="text-sm text-gray-500">Come back tomorrow for a new mood quiz!</p>
+            </div>
+          ) : moodQuizCompleted ? (
+            <div className="text-center">
+              <div className="mb-6">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <div className="text-4xl">{recommendedRecipe?.emoji || '😌'}</div>
+                  <div>
+                    <h3 className="text-xl font-bold">{detectedMood}</h3>
+                    <p className="text-gray-600">Perfect match found</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-orange-50 rounded-lg p-6 mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center text-white text-2xl">
+                    ☕
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-bold text-lg mb-1">{recommendedRecipe?.name}</h4>
+                    <p className="text-gray-600 mb-3">{recommendedRecipe?.description}</p>
+                    <div className="flex gap-2">
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Perfect Match</span>
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Mood-Based</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <Button 
+                  className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white"
+                  onClick={handleTryRecipe}
+                >
                   Try This Recipe (+25 Points)
                 </Button>
               </div>
               
               <Button 
                 variant="outline"
-                onClick={() => {setCurrentMoodQuizResult(""); setMoodQuizAnswers([]); setCurrentQuizQuestion(0);}}
+                onClick={resetMoodQuiz}
                 className="w-full"
               >
                 Retake Quiz
               </Button>
             </div>
-          ) : moodQuizAnswers.length < moodQuizQuestions.length ? (
+          ) : moodQuizStep < moodQuizQuestions.length ? (
             <div>
               <div className="mb-4">
-                <div className="text-sm text-gray-600 mb-2">Question {currentQuizQuestion + 1} of {moodQuizQuestions.length}</div>
-                <h3 className="text-lg font-semibold mb-4">{moodQuizQuestions[currentQuizQuestion].question}</h3>
+                <div className="text-sm text-gray-600 mb-2">Question {moodQuizStep + 1} of {moodQuizQuestions.length}</div>
+                <h3 className="text-lg font-semibold mb-4">{moodQuizQuestions[moodQuizStep].question}</h3>
                 <div className="space-y-2">
-                  {moodQuizQuestions[currentQuizQuestion].options.map((option, index) => (
+                  {moodQuizQuestions[moodQuizStep].options.map((option, index) => (
                     <Button
                       key={index}
                       variant="outline"
@@ -327,7 +494,7 @@ const DailyActivitiesTab = ({
               <p className="mb-4">Take today's mood quiz to get your personalized coffee recommendation!</p>
               <Button 
                 className="bg-purple-500 hover:bg-purple-600 text-white"
-                onClick={() => {setCurrentQuizQuestion(0); setMoodQuizAnswers([]);}}
+                onClick={() => setMoodQuizStep(0)}
               >
                 Start Mood Quiz
               </Button>
@@ -342,13 +509,39 @@ const DailyActivitiesTab = ({
           <h2 className="text-2xl font-bold text-white">Daily Coffee Fact Quiz</h2>
         </div>
         <div className="p-6">
-          {factQuizAnswers.length < factQuizQuestions.length ? (
+          {factQuizLocked && factQuizCompleted ? (
+            <div className="text-center">
+              <div className="text-6xl mb-4">✔️</div>
+              <h3 className="text-xl font-bold mb-4">Quiz Completed!</h3>
+              <p className="text-gray-600 mb-4">Come back tomorrow for a new coffee trivia quiz!</p>
+              <div className="bg-blue-50 rounded-lg p-4">
+                <p className="text-blue-800 font-semibold">Today's Score: {factQuizScore}/5 correct</p>
+                <p className="text-blue-600">Total Earned: +{factQuizScore * 10} Aroma Points</p>
+              </div>
+            </div>
+          ) : factQuizCompleted ? (
+            <div className="text-center">
+              <div className="text-6xl mb-4">✔️</div>
+              <h3 className="text-xl font-bold mb-4">Quiz Completed!</h3>
+              <p className="text-gray-600 mb-4">You got {factQuizScore}/5 correct!</p>
+              <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                <p className="text-blue-800 font-semibold">Total Earned: +{factQuizScore * 10} Aroma Points</p>
+              </div>
+              <Button 
+                variant="outline"
+                onClick={resetFactQuiz}
+                className="w-full"
+              >
+                Retake Quiz
+              </Button>
+            </div>
+          ) : factQuizStep < factQuizQuestions.length ? (
             <div>
               <div className="mb-4">
-                <div className="text-sm text-gray-600 mb-2">Question {factQuizAnswers.length + 1} of {factQuizQuestions.length}</div>
-                <h3 className="text-lg font-semibold mb-4">{factQuizQuestions[factQuizAnswers.length].question}</h3>
+                <div className="text-sm text-gray-600 mb-2">Question {factQuizStep + 1} of {factQuizQuestions.length}</div>
+                <h3 className="text-lg font-semibold mb-4">{factQuizQuestions[factQuizStep].question}</h3>
                 <div className="space-y-2">
-                  {factQuizQuestions[factQuizAnswers.length].options.map((option, index) => (
+                  {factQuizQuestions[factQuizStep].options.map((option, index) => (
                     <Button
                       key={index}
                       variant="outline"
@@ -366,7 +559,7 @@ const DailyActivitiesTab = ({
               <p className="mb-4">Test your coffee knowledge with today's quiz!</p>
               <Button 
                 className="bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => {setCurrentQuizQuestion(0); setFactQuizAnswers([]);}}
+                onClick={() => setFactQuizStep(0)}
               >
                 Start Knowledge Quiz
               </Button>
