@@ -18,6 +18,9 @@ import AchievementsTab from '@/components/quiz-results/AchievementsTab';
 import ResultsTabs from '@/components/quiz-results/ResultsTabs';
 import CoffeeAssistant from '@/components/CoffeeAssistant';
 import WelcomePage from '@/components/WelcomePage';
+import HowItWorksSection from '@/components/HowItWorksSection';
+import CoffeePersonasSection from '@/components/CoffeePersonasSection';
+import ProductsSection from '@/components/ProductsSection';
 
 // Sample data for coffee personas
 const personaDetails = {
@@ -117,6 +120,10 @@ const Index = () => {
 
   const handleGetStarted = () => {
     setShowWelcome(false);
+    // Scroll to top when entering main app
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   const handleTabChange = (newTab: string) => {
@@ -126,7 +133,16 @@ const Index = () => {
   };
 
   if (showWelcome) {
-    return <WelcomePage onGetStarted={handleGetStarted} />;
+    return (
+      <div>
+        <Navbar />
+        <WelcomePage onGetStarted={handleGetStarted} />
+        <HowItWorksSection />
+        <CoffeePersonasSection />
+        <ProductsSection />
+        <Footer />
+      </div>
+    );
   }
 
   return (

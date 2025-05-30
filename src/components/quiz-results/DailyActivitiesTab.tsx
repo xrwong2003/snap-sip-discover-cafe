@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -145,6 +146,11 @@ const DailyActivitiesTab = ({
     }
   ];
 
+  // Calculate brewed days count
+  const getBrewedDaysCount = () => {
+    return weeklyStreak.filter(day => day).length + (hasBrewedToday ? 1 : 0);
+  };
+
   // Check daily locks on component mount
   useEffect(() => {
     const today = new Date().toDateString();
@@ -278,13 +284,14 @@ const DailyActivitiesTab = ({
     toast({
       title: isCorrect ? "Correct! +10 Aroma Points" : "Incorrect",
       description: currentQuestion.explanation,
-      duration: 4000,
+      duration: 3000,
     });
     
     if (factQuizStep < factQuizQuestions.length - 1) {
+      // Auto-proceed to next question after 2 seconds
       setTimeout(() => {
         setFactQuizStep(factQuizStep + 1);
-      }, 2000);
+      }, 3000);
     } else {
       // Quiz completed
       setTimeout(() => {
@@ -297,10 +304,10 @@ const DailyActivitiesTab = ({
         
         toast({
           title: "✔️ Quiz Completed!",
-          description: `You got ${factQuizScore + (isCorrect ? 1 : 0)}/5 correct! Come back tomorrow for a new quiz. Total earned: +${(factQuizScore + (isCorrect ? 1 : 0)) * 10} Aroma Points.`,
+          description: `You got ${factQuizScore + (isCorrect ? 1 : 0)}/5 correct! Come back tomorrow for a new quiz.`,
           duration: 5000,
         });
-      }, 2000);
+      }, 3000);
     }
   };
 
@@ -374,7 +381,12 @@ const DailyActivitiesTab = ({
           </div>
           
           <div className="text-center">
-            <div className="text-3xl font-bold text-amber-600 mb-2">Streak: {consecutiveStreak} days</div>
+            <div className="text-3xl font-bold text-amber-600 mb-2">
+              Streak: {consecutiveStreak} {consecutiveStreak === 1 ? 'day' : 'days'}
+            </div>
+            <div className="text-lg text-gray-600 mb-4">
+              Brewed Days: {getBrewedDaysCount()} this week
+            </div>
             
             {hasBrewedToday ? (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">

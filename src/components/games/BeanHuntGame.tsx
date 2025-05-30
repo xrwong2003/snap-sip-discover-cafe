@@ -28,48 +28,19 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
   const spawnBean = useCallback(() => {
     const newBean: Bean = {
       id: nextBeanId,
-      x: Math.random() * 90, // 0-90% to keep beans in bounds
+      x: Math.random() * 85 + 5, // 5-90% to keep beans in bounds
       y: -5,
-      speed: 2 + Math.random() * 3 // Random speed between 2-5
+      speed: 1.5 + Math.random() * 2 // Random speed between 1.5-3.5
     };
     setBeans(prev => [...prev, newBean]);
     setNextBeanId(prev => prev + 1);
   }, [nextBeanId]);
 
-  const catchBean = (beanId: number) => {
-    const bean = beans.find(b => b.id === beanId);
-    if (bean) {
-      // Check if bean is near basket (within 10% range)
-      const distance = Math.abs(bean.x - basketPosition);
-      if (distance <= 8) {
-        setBeans(prev => prev.filter(b => b.id !== beanId));
-        setScore(prev => prev + 1);
-        
-        // Visual feedback
-        toast({
-          title: "Bean Caught! +1",
-          description: "",
-          duration: 1000,
-        });
-      }
-    }
-  };
-
-  const moveBasket = (direction: 'left' | 'right') => {
-    setBasketPosition(prev => {
-      if (direction === 'left') {
-        return Math.max(5, prev - 5);
-      } else {
-        return Math.min(95, prev + 5);
-      }
-    });
-  };
-
   const handleBasketDrag = (e: React.MouseEvent | React.TouchEvent) => {
     const gameArea = e.currentTarget.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const newPosition = ((clientX - gameArea.left) / gameArea.width) * 100;
-    setBasketPosition(Math.max(5, Math.min(95, newPosition)));
+    setBasketPosition(Math.max(8, Math.min(92, newPosition)));
   };
 
   const startGame = () => {
@@ -106,10 +77,10 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
   useEffect(() => {
     if (gameStarted && !gameEnded) {
       const spawnInterval = setInterval(() => {
-        if (Math.random() < 0.8) { // 80% chance to spawn a bean
+        if (Math.random() < 0.7) { // 70% chance to spawn a bean
           spawnBean();
         }
-      }, 800);
+      }, 900);
       return () => clearInterval(spawnInterval);
     }
   }, [gameStarted, gameEnded, spawnBean]);
@@ -122,16 +93,11 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
           .map(bean => {
             const newY = bean.y + bean.speed;
             
-            // Check collision with basket
-            if (newY >= 85 && newY <= 95) {
+            // Check collision with basket (enlarged hit area)
+            if (newY >= 82 && newY <= 95) {
               const distance = Math.abs(bean.x - basketPosition);
-              if (distance <= 8) {
+              if (distance <= 12) { // Increased collision area
                 setScore(s => s + 1);
-                toast({
-                  title: "Bean Caught! +1",
-                  description: "",
-                  duration: 500,
-                });
                 return null; // Remove caught bean
               }
             }
@@ -152,7 +118,7 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
           <div className="text-6xl mb-4">☕</div>
           <h2 className="text-2xl font-bold mb-4">Bean Hunt</h2>
           <p className="text-gray-600 mb-6">
-            Move your basket to catch falling coffee beans! 
+            Drag your basket to catch falling coffee beans! 
             You have 30 seconds to catch as many as possible.
           </p>
           <div className="space-y-4">
@@ -209,10 +175,9 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
         onTouchMove={handleBasketDrag}
       >
         {beans.map(bean => (
-          <button
+          <div
             key={bean.id}
-            onClick={() => catchBean(bean.id)}
-            className="absolute w-6 h-6 text-lg hover:scale-110 transition-transform cursor-pointer"
+            className="absolute w-8 h-8 text-xl transition-all duration-75 pointer-events-none"
             style={{ 
               left: `${bean.x}%`, 
               top: `${bean.y}%`,
@@ -220,12 +185,12 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
             }}
           >
             ☕
-          </button>
+          </div>
         ))}
         
-        {/* Movable Basket */}
+        {/* Enlarged Movable Basket */}
         <div 
-          className="absolute bottom-4 w-16 h-12 bg-amber-600 rounded-lg flex items-center justify-center text-2xl shadow-lg transition-all duration-100"
+          className="absolute bottom-4 w-20 h-14 bg-amber-600 rounded-lg flex items-center justify-center text-3xl shadow-lg transition-all duration-75"
           style={{ 
             left: `${basketPosition}%`,
             transform: 'translateX(-50%)'
@@ -233,23 +198,10 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
         >
           🧺
         </div>
-
-        {/* Basket Controls */}
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex gap-4">
-          <Button 
-            onMouseDown={() => moveBasket('left')}
-            onTouchStart={() => moveBasket('left')}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2"
-          >
-            ← Left
-          </Button>
-          <Button 
-            onMouseDown={() => moveBasket('right')}
-            onTouchStart={() => moveBasket('right')}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2"
-          >
-            Right →
-          </Button>
+        
+        {/* Instructions */}
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-90 rounded-lg px-4 py-2">
+          <p className="text-sm font-medium text-gray-700">Drag to move basket • Catch falling beans!</p>
         </div>
         
         {/* Ground indicator */}

@@ -10,8 +10,8 @@ const steps = [
   },
   {
     icon: <MessageSquare className="w-10 h-10 text-nescafe-red" />,
-    title: "Meet Your Barista",
-    description: "An AI-powered digital barista guides you through a fun personality quiz to discover your unique Coffee Persona."
+    title: "Take Coffee Quiz",
+    description: "Take our fun Coffee Mood Quiz to discover your unique Coffee Persona and get personalized recommendations."
   },
   {
     icon: <UserCircle className="w-10 h-10 text-nescafe-red" />,
@@ -26,7 +26,7 @@ const steps = [
   {
     icon: <Gift className="w-10 h-10 text-nescafe-red" />,
     title: "Redeem & Repeat",
-    description: "Redeem points for rewards at AR kiosks or online, unlock new content, and share your Coffee Persona on social media. Come back daily for fresh experiences!"
+    description: "Redeem points for rewards, unlock new content, and share your Coffee Persona on social media. Come back daily for fresh experiences!"
   }
 ];
 
