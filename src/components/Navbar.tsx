@@ -1,40 +1,105 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, X } from "lucide-react";
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [isDarkBackground, setIsDarkBackground] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 10);
+      
+      // Detect background color for font contrast
+      // On main page, check if we're over a dark section
+      if (location.pathname === '/') {
+        // Hero section is dark, other sections are light
+        setIsDarkBackground(scrollTop < 500);
+      } else {
+        // Other pages typically have light backgrounds
+        setIsDarkBackground(false);
+      }
     };
 
+    handleScroll(); // Check initial state
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
 
   const scrollToSection = (elementId: string) => {
-    // Check if we're on the main page
-    const isMainPage = window.location.pathname === '/';
-    
-    if (isMainPage) {
+    // Always navigate to main page first if not already there
+    if (location.pathname !== '/') {
+      navigate('/', { replace: true });
+      // Wait for navigation, then scroll
+      setTimeout(() => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      // Already on main page, scroll directly
       const element = document.getElementById(elementId);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    } else {
-      // Navigate to main page with hash
-      window.location.href = `/#${elementId}`;
     }
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLogoClick = () => {
+    if (location.pathname !== '/') {
+      navigate('/', { replace: true });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Determine text colors based on background
+  const getTextColor = () => {
+    if (isScrolled) {
+      return 'text-nescafe-brown hover:text-nescafe-red';
+    }
+    return isDarkBackground 
+      ? 'text-white drop-shadow-lg hover:text-nescafe-cream' 
+      : 'text-nescafe-brown hover:text-nescafe-red';
+  };
+
+  const getLogoSecondaryColor = () => {
+    if (isScrolled) {
+      return 'text-nescafe-brown';
+    }
+    return isDarkBackground 
+      ? 'text-white drop-shadow-lg' 
+      : 'text-nescafe-brown';
+  };
+
+  const getButtonStyle = () => {
+    if (isScrolled) {
+      return 'bg-nescafe-red text-white hover:bg-nescafe-brown';
+    }
+    return isDarkBackground
+      ? 'bg-white text-nescafe-red hover:bg-nescafe-cream'
+      : 'bg-nescafe-red text-white hover:bg-nescafe-brown';
+  };
+
+  const getMobileButtonColor = () => {
+    if (isScrolled) {
+      return 'text-nescafe-brown';
+    }
+    return isDarkBackground 
+      ? 'text-white drop-shadow-lg' 
+      : 'text-nescafe-brown';
   };
 
   const startCamera = async () => {
@@ -101,49 +166,39 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <a href="#" className="flex items-center">
+              <button onClick={handleLogoClick} className="flex items-center">
                 <span className="font-bold text-2xl text-nescafe-red">
                   NESCAFÉ
                 </span>
-                <span className={`ml-2 font-medium transition-colors ${
-                  isScrolled ? 'text-nescafe-brown' : 'text-white drop-shadow-lg'
-                }`}>
+                <span className={`ml-2 font-medium transition-colors ${getLogoSecondaryColor()}`}>
                   Snap & Sip AI
                 </span>
-              </a>
+              </button>
             </div>
             
             {/* Desktop menu */}
             <div className="hidden md:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('how-it-works')}
-                className={`font-medium transition-colors duration-300 ${
-                  isScrolled ? 'text-nescafe-brown hover:text-nescafe-red' : 'text-white drop-shadow-lg hover:text-nescafe-cream'
-                }`}
+                className={`font-medium transition-colors duration-300 ${getTextColor()}`}
               >
                 How It Works
               </button>
               <button 
                 onClick={() => scrollToSection('coffee-personas')}
-                className={`font-medium transition-colors duration-300 ${
-                  isScrolled ? 'text-nescafe-brown hover:text-nescafe-red' : 'text-white drop-shadow-lg hover:text-nescafe-cream'
-                }`}
+                className={`font-medium transition-colors duration-300 ${getTextColor()}`}
               >
                 Coffee Personas
               </button>
               <button 
                 onClick={() => scrollToSection('products')}
-                className={`font-medium transition-colors duration-300 ${
-                  isScrolled ? 'text-nescafe-brown hover:text-nescafe-red' : 'text-white drop-shadow-lg hover:text-nescafe-cream'
-                }`}
+                className={`font-medium transition-colors duration-300 ${getTextColor()}`}
               >
                 Products
               </button>
               <Button 
                 onClick={startCamera}
-                className={`${
-                  isScrolled ? 'bg-nescafe-red text-white' : 'bg-white text-nescafe-red'
-                } hover:bg-nescafe-brown hover:text-white border-2 border-nescafe-red font-medium px-6 transition-colors duration-300`}
+                className={`${getButtonStyle()} border-2 border-nescafe-red font-medium px-6 transition-colors duration-300`}
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Scan Now
@@ -154,9 +209,7 @@ const Navbar = () => {
             <div className="md:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`p-2 rounded-md transition-colors ${
-                  isScrolled ? 'text-nescafe-brown' : 'text-white drop-shadow-lg'
-                }`}
+                className={`p-2 rounded-md transition-colors ${getMobileButtonColor()}`}
               >
                 {isMobileMenuOpen ? (
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

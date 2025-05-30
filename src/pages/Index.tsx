@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -135,23 +134,20 @@ const Index = () => {
 
   const handleGetStarted = () => {
     setShowWelcome(false);
-    // Scroll to top when entering main app
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
+    // Immediately scroll to top when entering main app - no animation
+    window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
   const handleTabChange = (newTab: string) => {
     setActiveTab(newTab);
-    // Scroll to top only when changing tabs
+    // Only scroll to top when changing tabs, not when saving avatar
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAvatarSave = () => {
-    // Scroll to top after saving avatar
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
+    // Do not scroll or move viewport when saving avatar
+    // Just log the save action
+    console.log('Avatar saved with customization:', avatarCustomization);
   };
 
   if (showWelcome) {

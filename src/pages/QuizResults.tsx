@@ -197,6 +197,7 @@ const QuizResults = () => {
   };
 
   const handleAvatarSave = () => {
+    // Do not scroll or move viewport when saving avatar
     // Avatar save logic - could update user preferences, etc.
     console.log('Avatar saved with customization:', avatarCustomization);
   };
