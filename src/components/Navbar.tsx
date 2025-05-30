@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -13,28 +14,17 @@ const Navbar = () => {
   const [showCamera, setShowCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
-  const [isDarkBackground, setIsDarkBackground] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       setIsScrolled(scrollTop > 10);
-      
-      // Detect background color for font contrast
-      // On main page, check if we're over a dark section
-      if (location.pathname === '/') {
-        // Hero section is dark, other sections are light
-        setIsDarkBackground(scrollTop < 500);
-      } else {
-        // Other pages typically have light backgrounds
-        setIsDarkBackground(false);
-      }
     };
 
-    handleScroll(); // Check initial state
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [location.pathname]);
+  }, []);
 
   const scrollToSection = (elementId: string) => {
     // Always navigate to main page first if not already there
@@ -65,47 +55,10 @@ const Navbar = () => {
     }
   };
 
-  // Determine text colors based on background
-  const getTextColor = () => {
-    if (isScrolled) {
-      return 'text-nescafe-brown hover:text-nescafe-red';
-    }
-    return isDarkBackground 
-      ? 'text-white drop-shadow-lg hover:text-nescafe-cream' 
-      : 'text-nescafe-brown hover:text-nescafe-red';
-  };
-
-  const getLogoSecondaryColor = () => {
-    if (isScrolled) {
-      return 'text-nescafe-brown';
-    }
-    return isDarkBackground 
-      ? 'text-white drop-shadow-lg' 
-      : 'text-nescafe-brown';
-  };
-
-  const getButtonStyle = () => {
-    if (isScrolled) {
-      return 'bg-nescafe-red text-white hover:bg-nescafe-brown';
-    }
-    return isDarkBackground
-      ? 'bg-white text-nescafe-red hover:bg-nescafe-cream'
-      : 'bg-nescafe-red text-white hover:bg-nescafe-brown';
-  };
-
-  const getMobileButtonColor = () => {
-    if (isScrolled) {
-      return 'text-nescafe-brown';
-    }
-    return isDarkBackground 
-      ? 'text-white drop-shadow-lg' 
-      : 'text-nescafe-brown';
-  };
-
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } // Use back camera on mobile
+        video: { facingMode: 'environment' }
       });
       setCameraStream(stream);
       setShowCamera(true);
@@ -131,7 +84,7 @@ const Navbar = () => {
 
   const handleScanSuccess = () => {
     stopCamera();
-    const bonusPoints = Math.floor(Math.random() * 50) + 25; // 25-75 points
+    const bonusPoints = Math.floor(Math.random() * 50) + 25;
     
     toast({
       title: "✅ Scan Successful!",
@@ -139,13 +92,11 @@ const Navbar = () => {
       duration: 5000,
     });
 
-    // Save scan timestamp
     localStorage.setItem('lastScanTime', new Date().toISOString());
     localStorage.setItem('scanBonusPoints', bonusPoints.toString());
   };
 
   const simulateScan = () => {
-    // Simulate QR code detection after 2 seconds
     setTimeout(() => {
       handleScanSuccess();
     }, 2000);
@@ -153,7 +104,6 @@ const Navbar = () => {
 
   useEffect(() => {
     if (showCamera && videoRef.current) {
-      // Simulate scan detection
       simulateScan();
     }
   }, [showCamera]);
@@ -170,7 +120,7 @@ const Navbar = () => {
                 <span className="font-bold text-2xl text-nescafe-red">
                   NESCAFÉ
                 </span>
-                <span className={`ml-2 font-medium transition-colors ${getLogoSecondaryColor()}`}>
+                <span className="ml-2 font-medium text-nescafe-brown">
                   Snap & Sip AI
                 </span>
               </button>
@@ -180,25 +130,25 @@ const Navbar = () => {
             <div className="hidden md:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('how-it-works')}
-                className={`font-medium transition-colors duration-300 ${getTextColor()}`}
+                className="font-medium transition-colors duration-300 text-nescafe-brown hover:text-nescafe-red"
               >
                 How It Works
               </button>
               <button 
                 onClick={() => scrollToSection('coffee-personas')}
-                className={`font-medium transition-colors duration-300 ${getTextColor()}`}
+                className="font-medium transition-colors duration-300 text-nescafe-brown hover:text-nescafe-red"
               >
                 Coffee Personas
               </button>
               <button 
                 onClick={() => scrollToSection('products')}
-                className={`font-medium transition-colors duration-300 ${getTextColor()}`}
+                className="font-medium transition-colors duration-300 text-nescafe-brown hover:text-nescafe-red"
               >
                 Products
               </button>
               <Button 
                 onClick={startCamera}
-                className={`${getButtonStyle()} border-2 border-nescafe-red font-medium px-6 transition-colors duration-300`}
+                className="bg-nescafe-red text-white hover:bg-nescafe-brown border-2 border-nescafe-red font-medium px-6 transition-colors duration-300"
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Scan Now
@@ -209,7 +159,7 @@ const Navbar = () => {
             <div className="md:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`p-2 rounded-md transition-colors ${getMobileButtonColor()}`}
+                className="p-2 rounded-md transition-colors text-nescafe-brown"
               >
                 {isMobileMenuOpen ? (
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

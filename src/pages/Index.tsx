@@ -134,19 +134,17 @@ const Index = () => {
 
   const handleGetStarted = () => {
     setShowWelcome(false);
-    // Immediately scroll to top when entering main app - no animation
+    // Show the top of the page immediately - no scrolling animation
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
   const handleTabChange = (newTab: string) => {
     setActiveTab(newTab);
-    // Only scroll to top when changing tabs, not when saving avatar
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAvatarSave = () => {
-    // Do not scroll or move viewport when saving avatar
-    // Just log the save action
+    // Do not scroll or move viewport when saving avatar - keep page static
     console.log('Avatar saved with customization:', avatarCustomization);
   };
 

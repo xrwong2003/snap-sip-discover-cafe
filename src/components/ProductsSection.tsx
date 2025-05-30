@@ -5,38 +5,38 @@ const products = [
   {
     name: "NESCAFÉ Gold",
     description: "Premium instant coffee with rich, aromatic flavor",
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&auto=format&fit=crop&q=60",
-    types: ["Americano", "Latte", "Cappuccino"]
+    image: "/lovable-uploads/d7313ef4-838e-4360-819b-972ad9652a45.png",
+    types: ["Rich & Smooth", "Pure Soluble Coffee", "100 Cups"]
   },
   {
     name: "NESCAFÉ 3in1",
     description: "Convenient mix of coffee, creamer, and sugar",
-    image: "https://images.unsplash.com/photo-1574914629385-46e8178f0e9f?w=300&auto=format&fit=crop&q=60",
-    types: ["Original", "Strong", "Creamy"]
+    image: "/lovable-uploads/e7bb1326-debe-4dbd-915a-e1243e8b385b.png",
+    types: ["Original", "Aromatic & Balanced", "25 Sachets"]
   },
   {
     name: "NESCAFÉ Dolce Gusto",
     description: "Cafe-quality drinks with capsule convenience",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&auto=format&fit=crop&q=60",
-    types: ["Espresso", "Mocha", "Macchiato"]
+    image: "/lovable-uploads/f1b854e8-0d12-4be1-9eec-3fd5711435db.png",
+    types: ["Cappuccino", "Ristretto Ardenza", "16 Capsules"]
   },
   {
     name: "NESCAFÉ Cold Brew",
     description: "Smooth, refreshing iced coffee experience",
-    image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=300&auto=format&fit=crop&q=60",
-    types: ["Classic", "Vanilla", "Caramel"]
+    image: "/lovable-uploads/9fca2f95-60b3-40a5-b21d-4b0f65bc84d1.png",
+    types: ["Latte", "Milk Coffee", "Smooth Taste"]
   },
   {
     name: "NESCAFÉ Frappé",
     description: "Creamy, frothy iced coffee delight",
-    image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300&auto=format&fit=crop&q=60",
-    types: ["Original", "Coconut", "Hazelnut"]
+    image: "/lovable-uploads/34daee69-beb3-4eb5-bf63-bd2906a6e70b.png",
+    types: ["Typ Eiskaffee", "Lactose Free", "100g"]
   },
   {
     name: "NESCAFÉ Azera",
     description: "Barista-style coffee with premium beans",
-    image: "https://images.unsplash.com/photo-1585515656644-5d6fa60bf987?w=300&auto=format&fit=crop&q=60",
-    types: ["Intenso", "Smooth", "Americano"]
+    image: "/lovable-uploads/dda013d5-f4d5-4c3d-8d72-ec5e21a2e807.png",
+    types: ["Espresso", "Intenso", "Americano"]
   }
 ];
 
@@ -54,11 +54,11 @@ const ProductsSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product, index) => (
             <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="h-48 overflow-hidden">
+              <div className="h-64 overflow-hidden bg-gray-50 flex items-center justify-center p-4">
                 <img 
                   src={product.image} 
                   alt={product.name}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  className="max-w-full max-h-full object-contain hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div className="p-6">
