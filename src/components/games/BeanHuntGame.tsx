@@ -30,7 +30,7 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
       id: nextBeanId,
       x: Math.random() * 85 + 5, // 5-90% to keep beans in bounds
       y: -5,
-      speed: 1.5 + Math.random() * 2 // Random speed between 1.5-3.5
+      speed: 1.2 + Math.random() * 1.5 // Smoother speed between 1.2-2.7
     };
     setBeans(prev => [...prev, newBean]);
     setNextBeanId(prev => prev + 1);
@@ -40,7 +40,7 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
     const gameArea = e.currentTarget.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const newPosition = ((clientX - gameArea.left) / gameArea.width) * 100;
-    setBasketPosition(Math.max(8, Math.min(92, newPosition)));
+    setBasketPosition(Math.max(10, Math.min(90, newPosition)));
   };
 
   const startGame = () => {
@@ -77,15 +77,15 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
   useEffect(() => {
     if (gameStarted && !gameEnded) {
       const spawnInterval = setInterval(() => {
-        if (Math.random() < 0.7) { // 70% chance to spawn a bean
+        if (Math.random() < 0.65) { // 65% chance to spawn a bean
           spawnBean();
         }
-      }, 900);
+      }, 1200); // Slightly longer interval for smoother gameplay
       return () => clearInterval(spawnInterval);
     }
   }, [gameStarted, gameEnded, spawnBean]);
 
-  // Bean movement and collision detection
+  // Bean movement and collision detection - optimized for 60fps
   useEffect(() => {
     if (gameStarted && !gameEnded) {
       const moveInterval = setInterval(() => {
@@ -94,9 +94,9 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
             const newY = bean.y + bean.speed;
             
             // Check collision with basket (enlarged hit area)
-            if (newY >= 82 && newY <= 95) {
+            if (newY >= 78 && newY <= 95) {
               const distance = Math.abs(bean.x - basketPosition);
-              if (distance <= 12) { // Increased collision area
+              if (distance <= 14) { // Slightly larger collision area
                 setScore(s => s + 1);
                 return null; // Remove caught bean
               }
@@ -106,7 +106,7 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
           })
           .filter((bean): bean is Bean => bean !== null && bean.y < 100) // Remove beans that fell off screen
         );
-      }, 50);
+      }, 16); // 60fps animation (1000/60 ≈ 16ms)
       return () => clearInterval(moveInterval);
     }
   }, [gameStarted, gameEnded, basketPosition]);
@@ -170,18 +170,21 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
 
       {/* Game Area */}
       <div 
-        className="flex-1 relative overflow-hidden cursor-crosshair"
+        className="flex-1 relative overflow-hidden cursor-crosshair select-none"
         onMouseMove={handleBasketDrag}
         onTouchMove={handleBasketDrag}
+        style={{ touchAction: 'none' }}
       >
         {beans.map(bean => (
           <div
             key={bean.id}
-            className="absolute w-8 h-8 text-xl transition-all duration-75 pointer-events-none"
+            className="absolute w-8 h-8 text-xl pointer-events-none"
             style={{ 
               left: `${bean.x}%`, 
               top: `${bean.y}%`,
-              transform: 'translate(-50%, -50%)'
+              transform: 'translate(-50%, -50%)',
+              transition: 'none', // Remove any CSS transitions for smoother animation
+              willChange: 'transform' // Optimize for animations
             }}
           >
             ☕
@@ -190,10 +193,12 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
         
         {/* Enlarged Movable Basket */}
         <div 
-          className="absolute bottom-4 w-20 h-14 bg-amber-600 rounded-lg flex items-center justify-center text-3xl shadow-lg transition-all duration-75"
+          className="absolute bottom-4 w-24 h-16 bg-amber-600 rounded-lg flex items-center justify-center text-3xl shadow-lg pointer-events-none"
           style={{ 
             left: `${basketPosition}%`,
-            transform: 'translateX(-50%)'
+            transform: 'translateX(-50%)',
+            transition: 'none', // Remove transitions for instant response
+            willChange: 'transform'
           }}
         >
           🧺

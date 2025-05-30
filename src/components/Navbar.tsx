@@ -22,9 +22,17 @@ const Navbar = () => {
   }, []);
 
   const scrollToSection = (elementId: string) => {
-    const element = document.getElementById(elementId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Check if we're on the main page
+    const isMainPage = window.location.pathname === '/';
+    
+    if (isMainPage) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      // Navigate to main page with hash
+      window.location.href = `/#${elementId}`;
     }
     setIsMobileMenuOpen(false);
   };
@@ -109,25 +117,25 @@ const Navbar = () => {
             <div className="hidden md:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('how-it-works')}
-                className={`hover:text-nescafe-red transition-colors font-medium ${
-                  isScrolled ? 'text-nescafe-brown' : 'text-white drop-shadow-lg'
-                } hover:underline`}
+                className={`font-medium transition-colors duration-300 ${
+                  isScrolled ? 'text-nescafe-brown hover:text-nescafe-red' : 'text-white drop-shadow-lg hover:text-nescafe-cream'
+                }`}
               >
                 How It Works
               </button>
               <button 
                 onClick={() => scrollToSection('coffee-personas')}
-                className={`hover:text-nescafe-red transition-colors font-medium ${
-                  isScrolled ? 'text-nescafe-brown' : 'text-white drop-shadow-lg'
-                } hover:underline`}
+                className={`font-medium transition-colors duration-300 ${
+                  isScrolled ? 'text-nescafe-brown hover:text-nescafe-red' : 'text-white drop-shadow-lg hover:text-nescafe-cream'
+                }`}
               >
                 Coffee Personas
               </button>
               <button 
                 onClick={() => scrollToSection('products')}
-                className={`hover:text-nescafe-red transition-colors font-medium ${
-                  isScrolled ? 'text-nescafe-brown' : 'text-white drop-shadow-lg'
-                } hover:underline`}
+                className={`font-medium transition-colors duration-300 ${
+                  isScrolled ? 'text-nescafe-brown hover:text-nescafe-red' : 'text-white drop-shadow-lg hover:text-nescafe-cream'
+                }`}
               >
                 Products
               </button>
@@ -135,7 +143,7 @@ const Navbar = () => {
                 onClick={startCamera}
                 className={`${
                   isScrolled ? 'bg-nescafe-red text-white' : 'bg-white text-nescafe-red'
-                } hover:bg-nescafe-brown hover:text-white border-2 border-nescafe-red font-medium px-6`}
+                } hover:bg-nescafe-brown hover:text-white border-2 border-nescafe-red font-medium px-6 transition-colors duration-300`}
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Scan Now
@@ -188,7 +196,7 @@ const Navbar = () => {
                 <div className="px-4">
                   <Button 
                     onClick={startCamera}
-                    className="w-full bg-nescafe-red text-white hover:bg-nescafe-brown border-2 border-nescafe-red font-medium"
+                    className="w-full bg-nescafe-red text-white hover:bg-nescafe-brown border-2 border-nescafe-red font-medium transition-colors duration-300"
                   >
                     <Camera className="w-4 h-4 mr-2" />
                     Scan Now

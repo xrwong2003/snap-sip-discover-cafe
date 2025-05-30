@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -146,9 +145,11 @@ const DailyActivitiesTab = ({
     }
   ];
 
-  // Calculate brewed days count
+  // Calculate brewed days count - count orange-colored circles
   const getBrewedDaysCount = () => {
-    return weeklyStreak.filter(day => day).length + (hasBrewedToday ? 1 : 0);
+    const orangeDays = weeklyStreak.filter(day => day).length;
+    const todayCount = hasBrewedToday ? 1 : 0;
+    return orangeDays + todayCount;
   };
 
   // Check daily locks on component mount
@@ -382,10 +383,10 @@ const DailyActivitiesTab = ({
           
           <div className="text-center">
             <div className="text-3xl font-bold text-amber-600 mb-2">
-              Streak: {consecutiveStreak} {consecutiveStreak === 1 ? 'day' : 'days'}
+              {getBrewedDaysCount()} {getBrewedDaysCount() === 1 ? 'day' : 'days'}
             </div>
             <div className="text-lg text-gray-600 mb-4">
-              Brewed Days: {getBrewedDaysCount()} this week
+              Consecutive Streak: {consecutiveStreak} {consecutiveStreak === 1 ? 'day' : 'days'}
             </div>
             
             {hasBrewedToday ? (

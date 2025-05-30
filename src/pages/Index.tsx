@@ -99,7 +99,22 @@ const Index = () => {
         });
       }
     }
-  }, [personaName, todayMood]);
+
+    // Handle hash navigation from header
+    const handleHashNavigation = () => {
+      const hash = window.location.hash.substring(1);
+      if (hash && showWelcome) {
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
+    };
+
+    handleHashNavigation();
+  }, [personaName, todayMood, showWelcome]);
 
   const handleUpdateMood = (mood: string) => {
     setTodayMood(mood);
@@ -130,6 +145,13 @@ const Index = () => {
     setActiveTab(newTab);
     // Scroll to top only when changing tabs
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleAvatarSave = () => {
+    // Scroll to top after saving avatar
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   if (showWelcome) {
@@ -163,6 +185,7 @@ const Index = () => {
                 earnedBadges={earnedBadges}
                 avatarCustomization={avatarCustomization}
                 setAvatarCustomization={setAvatarCustomization}
+                onAvatarSave={handleAvatarSave}
               />
             )}
 
