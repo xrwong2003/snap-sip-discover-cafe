@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import ScrollToTop from '@/components/ScrollToTop';
 import { useToast } from "@/hooks/use-toast";
 import { 
   coffeeFacts, 
@@ -118,6 +119,12 @@ const Index = () => {
     setShowWelcome(false);
   };
 
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    // Scroll to top only when changing tabs
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (showWelcome) {
     return <WelcomePage onGetStarted={handleGetStarted} />;
   }
@@ -129,7 +136,7 @@ const Index = () => {
         <section className="py-16 bg-nescafe-cream">
           <div className="section-container">
             {/* Tabs Navigation */}
-            <ResultsTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+            <ResultsTabs activeTab={activeTab} setActiveTab={handleTabChange} />
 
             {/* Profile Tab */}
             {activeTab === 'profile' && (

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +31,7 @@ const DailyActivitiesTab = ({
   // Daily Brew Streak State
   const [weeklyStreak, setWeeklyStreak] = useState([true, true, false, true, true, false, false]); 
   const [hasBrewedToday, setHasBrewedToday] = useState(false);
+  const [consecutiveStreak, setConsecutiveStreak] = useState(currentStreak);
   
   // Coffee Mood Quiz State
   const [moodQuizStep, setMoodQuizStep] = useState(0);
@@ -111,15 +111,15 @@ const DailyActivitiesTab = ({
     }
   ];
 
-  // Available games
+  // Available games with updated durations
   const playableGames = [
     { 
       id: 'bean-hunt',
       name: "Bean Hunt", 
       difficulty: "Easy", 
-      time: "2 min", 
+      time: "30 sec", 
       points: 15, 
-      description: "Catch falling coffee beans to earn points!",
+      description: "Catch falling coffee beans with your basket!",
       icon: "☕",
       color: "bg-orange-500"
     },
@@ -127,7 +127,7 @@ const DailyActivitiesTab = ({
       id: 'pod-match',
       name: "Pod Match", 
       difficulty: "Medium", 
-      time: "3 min", 
+      time: "1 min", 
       points: 20, 
       description: "Match coffee pod pairs",
       icon: "🍀",
@@ -137,24 +137,20 @@ const DailyActivitiesTab = ({
       id: 'brew-master',
       name: "Brew Master", 
       difficulty: "Hard", 
-      time: "5 min", 
+      time: "2 min", 
       points: 30, 
-      description: "Perfect the brewing process",
+      description: "Master the coffee brewing process",
       icon: "🔥",
       color: "bg-blue-500"
     }
   ];
-
-  // Global scroll reset function
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   // Check daily locks on component mount
   useEffect(() => {
     const today = new Date().toDateString();
     const moodQuizDate = localStorage.getItem('moodQuizDate');
     const factQuizDate = localStorage.getItem('factQuizDate');
+    const lastBrewDate = localStorage.getItem('lastBrewDate');
     
     if (moodQuizDate === today) {
       setMoodQuizLocked(true);
@@ -165,11 +161,39 @@ const DailyActivitiesTab = ({
       setFactQuizLocked(true);
       setFactQuizCompleted(true);
     }
+
+    if (lastBrewDate === today) {
+      setHasBrewedToday(true);
+    }
+
+    // Load consecutive streak from localStorage
+    const savedStreak = localStorage.getItem('consecutiveBrewStreak');
+    if (savedStreak) {
+      setConsecutiveStreak(parseInt(savedStreak));
+    }
   }, []);
 
   // Daily Brew Streak Functions
   const handleBrewToday = () => {
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    const lastBrewDate = localStorage.getItem('lastBrewDate');
+    
     setHasBrewedToday(true);
+    localStorage.setItem('lastBrewDate', today);
+    
+    // Calculate new consecutive streak
+    let newStreak = 1;
+    if (lastBrewDate === yesterday) {
+      // Continue streak
+      newStreak = consecutiveStreak + 1;
+    } else if (lastBrewDate !== today) {
+      // Start new streak or reset
+      newStreak = 1;
+    }
+    
+    setConsecutiveStreak(newStreak);
+    localStorage.setItem('consecutiveBrewStreak', newStreak.toString());
     
     // Update today's status in weekly streak (assuming today is index 4 - Thursday)
     const updatedStreak = [...weeklyStreak];
@@ -189,7 +213,6 @@ const DailyActivitiesTab = ({
     
     if (moodQuizStep < moodQuizQuestions.length - 1) {
       setMoodQuizStep(moodQuizStep + 1);
-      scrollToTop();
     } else {
       // Quiz completed - analyze mood
       analyzeMoodResults(newAnswers);
@@ -231,15 +254,12 @@ const DailyActivitiesTab = ({
       title: "Coffee Mood Quiz Complete!",
       description: "Perfect match found! +25 Aroma Points earned.",
     });
-    
-    scrollToTop();
   };
 
   const resetMoodQuiz = () => {
     setMoodQuizStep(0);
     setMoodQuizAnswers([]);
     setMoodQuizCompleted(false);
-    scrollToTop();
   };
 
   // Fact Quiz Functions
@@ -264,7 +284,6 @@ const DailyActivitiesTab = ({
     if (factQuizStep < factQuizQuestions.length - 1) {
       setTimeout(() => {
         setFactQuizStep(factQuizStep + 1);
-        scrollToTop();
       }, 2000);
     } else {
       // Quiz completed
@@ -281,8 +300,6 @@ const DailyActivitiesTab = ({
           description: `You got ${factQuizScore + (isCorrect ? 1 : 0)}/5 correct! Come back tomorrow for a new quiz. Total earned: +${(factQuizScore + (isCorrect ? 1 : 0)) * 10} Aroma Points.`,
           duration: 5000,
         });
-        
-        scrollToTop();
       }, 2000);
     }
   };
@@ -292,7 +309,6 @@ const DailyActivitiesTab = ({
     setFactQuizAnswers([]);
     setFactQuizCompleted(false);
     setFactQuizScore(0);
-    scrollToTop();
   };
 
   // Game Functions
@@ -358,7 +374,7 @@ const DailyActivitiesTab = ({
           </div>
           
           <div className="text-center">
-            <div className="text-3xl font-bold text-amber-600 mb-2">{currentStreak} days</div>
+            <div className="text-3xl font-bold text-amber-600 mb-2">Streak: {consecutiveStreak} days</div>
             
             {hasBrewedToday ? (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">

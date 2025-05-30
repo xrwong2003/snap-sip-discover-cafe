@@ -19,50 +19,77 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
   const { toast } = useToast();
   const [gameStarted, setGameStarted] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
+  const [timeLeft, setTimeLeft] = useState(30); // 30 seconds
   const [score, setScore] = useState(0);
   const [beans, setBeans] = useState<Bean[]>([]);
   const [nextBeanId, setNextBeanId] = useState(1);
+  const [basketPosition, setBasketPosition] = useState(50); // Percentage from left
 
   const spawnBean = useCallback(() => {
     const newBean: Bean = {
       id: nextBeanId,
       x: Math.random() * 90, // 0-90% to keep beans in bounds
       y: -5,
-      speed: 1 + Math.random() * 2 // Random speed between 1-3
+      speed: 2 + Math.random() * 3 // Random speed between 2-5
     };
     setBeans(prev => [...prev, newBean]);
     setNextBeanId(prev => prev + 1);
   }, [nextBeanId]);
 
   const catchBean = (beanId: number) => {
-    setBeans(prev => prev.filter(bean => bean.id !== beanId));
-    setScore(prev => prev + 1);
+    const bean = beans.find(b => b.id === beanId);
+    if (bean) {
+      // Check if bean is near basket (within 10% range)
+      const distance = Math.abs(bean.x - basketPosition);
+      if (distance <= 8) {
+        setBeans(prev => prev.filter(b => b.id !== beanId));
+        setScore(prev => prev + 1);
+        
+        // Visual feedback
+        toast({
+          title: "Bean Caught! +1",
+          description: "",
+          duration: 1000,
+        });
+      }
+    }
+  };
+
+  const moveBasket = (direction: 'left' | 'right') => {
+    setBasketPosition(prev => {
+      if (direction === 'left') {
+        return Math.max(5, prev - 5);
+      } else {
+        return Math.min(95, prev + 5);
+      }
+    });
+  };
+
+  const handleBasketDrag = (e: React.MouseEvent | React.TouchEvent) => {
+    const gameArea = e.currentTarget.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const newPosition = ((clientX - gameArea.left) / gameArea.width) * 100;
+    setBasketPosition(Math.max(5, Math.min(95, newPosition)));
   };
 
   const startGame = () => {
     setGameStarted(true);
     setScore(0);
     setBeans([]);
-    setTimeLeft(120);
+    setTimeLeft(30);
+    setBasketPosition(50);
   };
 
   const endGame = () => {
     setGameEnded(true);
-    const earnedPoints = score >= 10 ? 15 : Math.floor(score / 2); // Minimum threshold logic
+    const earnedPoints = score >= 5 ? 15 : Math.floor(score * 2); // Minimum threshold logic
     onGameEnd(earnedPoints);
     
-    if (score >= 10) {
-      toast({
-        title: "You earned +15 Aroma Points!",
-        description: `Great job! You caught ${score} beans!`,
-      });
-    } else {
-      toast({
-        title: `You earned +${earnedPoints} Aroma Points!`,
-        description: `You caught ${score} beans. Try again to earn more points!`,
-      });
-    }
+    toast({
+      title: `You caught ${score} beans!`,
+      description: `+${earnedPoints} Aroma Points earned!`,
+      duration: 3000,
+    });
   };
 
   // Game timer
@@ -79,32 +106,44 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
   useEffect(() => {
     if (gameStarted && !gameEnded) {
       const spawnInterval = setInterval(() => {
-        if (Math.random() < 0.6) { // 60% chance to spawn a bean
+        if (Math.random() < 0.8) { // 80% chance to spawn a bean
           spawnBean();
         }
-      }, 1500);
+      }, 800);
       return () => clearInterval(spawnInterval);
     }
   }, [gameStarted, gameEnded, spawnBean]);
 
-  // Bean movement
+  // Bean movement and collision detection
   useEffect(() => {
     if (gameStarted && !gameEnded) {
       const moveInterval = setInterval(() => {
         setBeans(prev => prev
-          .map(bean => ({ ...bean, y: bean.y + bean.speed }))
-          .filter(bean => bean.y < 100) // Remove beans that fell off screen
+          .map(bean => {
+            const newY = bean.y + bean.speed;
+            
+            // Check collision with basket
+            if (newY >= 85 && newY <= 95) {
+              const distance = Math.abs(bean.x - basketPosition);
+              if (distance <= 8) {
+                setScore(s => s + 1);
+                toast({
+                  title: "Bean Caught! +1",
+                  description: "",
+                  duration: 500,
+                });
+                return null; // Remove caught bean
+              }
+            }
+            
+            return { ...bean, y: newY };
+          })
+          .filter((bean): bean is Bean => bean !== null && bean.y < 100) // Remove beans that fell off screen
         );
       }, 50);
       return () => clearInterval(moveInterval);
     }
-  }, [gameStarted, gameEnded]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, [gameStarted, gameEnded, basketPosition]);
 
   if (!gameStarted) {
     return (
@@ -113,8 +152,8 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
           <div className="text-6xl mb-4">☕</div>
           <h2 className="text-2xl font-bold mb-4">Bean Hunt</h2>
           <p className="text-gray-600 mb-6">
-            Catch falling coffee beans before they hit the bottom! 
-            You have 2 minutes to catch as many as possible.
+            Move your basket to catch falling coffee beans! 
+            You have 30 seconds to catch as many as possible.
           </p>
           <div className="space-y-4">
             <Button onClick={startGame} className="w-full bg-orange-500 hover:bg-orange-600">
@@ -139,7 +178,7 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
             You caught <span className="font-bold text-orange-600">{score}</span> beans!
           </p>
           <p className="text-sm text-gray-500 mb-6">
-            {score >= 10 ? "Excellent work! +15 Aroma Points earned!" : `+${Math.floor(score / 2)} Aroma Points earned. Try again for more!`}
+            {score >= 5 ? "+15 Aroma Points earned!" : `+${Math.floor(score * 2)} Aroma Points earned. Try again for more!`}
           </p>
           <Button onClick={onClose} className="w-full bg-orange-500 hover:bg-orange-600">
             Close
@@ -156,7 +195,7 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
         <div className="text-lg font-bold">Bean Hunt</div>
         <div className="flex gap-4 items-center">
           <div className="text-lg font-bold">Score: {score}</div>
-          <div className="text-lg font-bold">Time: {formatTime(timeLeft)}</div>
+          <div className="text-lg font-bold">Time: {timeLeft}s</div>
           <Button onClick={endGame} variant="outline" size="sm">
             End Game
           </Button>
@@ -164,12 +203,16 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
       </div>
 
       {/* Game Area */}
-      <div className="flex-1 relative overflow-hidden">
+      <div 
+        className="flex-1 relative overflow-hidden cursor-crosshair"
+        onMouseMove={handleBasketDrag}
+        onTouchMove={handleBasketDrag}
+      >
         {beans.map(bean => (
           <button
             key={bean.id}
             onClick={() => catchBean(bean.id)}
-            className="absolute w-8 h-8 text-2xl hover:scale-110 transition-transform cursor-pointer"
+            className="absolute w-6 h-6 text-lg hover:scale-110 transition-transform cursor-pointer"
             style={{ 
               left: `${bean.x}%`, 
               top: `${bean.y}%`,
@@ -179,6 +222,35 @@ const BeanHuntGame = ({ onGameEnd, onClose }: BeanHuntGameProps) => {
             ☕
           </button>
         ))}
+        
+        {/* Movable Basket */}
+        <div 
+          className="absolute bottom-4 w-16 h-12 bg-amber-600 rounded-lg flex items-center justify-center text-2xl shadow-lg transition-all duration-100"
+          style={{ 
+            left: `${basketPosition}%`,
+            transform: 'translateX(-50%)'
+          }}
+        >
+          🧺
+        </div>
+
+        {/* Basket Controls */}
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex gap-4">
+          <Button 
+            onMouseDown={() => moveBasket('left')}
+            onTouchStart={() => moveBasket('left')}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2"
+          >
+            ← Left
+          </Button>
+          <Button 
+            onMouseDown={() => moveBasket('right')}
+            onTouchStart={() => moveBasket('right')}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2"
+          >
+            Right →
+          </Button>
+        </div>
         
         {/* Ground indicator */}
         <div className="absolute bottom-0 left-0 right-0 h-2 bg-amber-600"></div>

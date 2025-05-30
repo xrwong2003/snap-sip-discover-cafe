@@ -19,7 +19,7 @@ const PodMatchGame = ({ onGameEnd, onClose }: PodMatchGameProps) => {
   const { toast } = useToast();
   const [gameStarted, setGameStarted] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes
+  const [timeLeft, setTimeLeft] = useState(60); // 1 minute
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [matches, setMatches] = useState(0);
@@ -45,7 +45,7 @@ const PodMatchGame = ({ onGameEnd, onClose }: PodMatchGameProps) => {
     setMatches(0);
     setMoves(0);
     setFlippedCards([]);
-    setTimeLeft(180);
+    setTimeLeft(60);
     initializeCards();
   };
 
@@ -58,11 +58,13 @@ const PodMatchGame = ({ onGameEnd, onClose }: PodMatchGameProps) => {
       toast({
         title: "Great Match! +20 Aroma Points!",
         description: `Completed in ${moves} moves!`,
+        duration: 3000,
       });
     } else {
       toast({
         title: "Game Over!",
         description: `You matched ${matches} pairs. +${earnedPoints} Aroma Points earned!`,
+        duration: 3000,
       });
     }
   };
@@ -102,6 +104,12 @@ const PodMatchGame = ({ onGameEnd, onClose }: PodMatchGameProps) => {
             }
             return newMatches;
           });
+          
+          toast({
+            title: "Match Found! +2.5 Points",
+            description: "",
+            duration: 1000,
+          });
         } else {
           // No match, flip back
           setCards(prev => prev.map(c => 
@@ -125,12 +133,6 @@ const PodMatchGame = ({ onGameEnd, onClose }: PodMatchGameProps) => {
     }
   }, [gameStarted, gameEnded, timeLeft]);
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
   if (!gameStarted) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -139,7 +141,7 @@ const PodMatchGame = ({ onGameEnd, onClose }: PodMatchGameProps) => {
           <h2 className="text-2xl font-bold mb-4">Pod Match</h2>
           <p className="text-gray-600 mb-6">
             Find matching pairs of coffee pods by flipping cards. 
-            Match all 8 pairs within 3 minutes to win!
+            Match all 8 pairs within 1 minute to win!
           </p>
           <div className="space-y-4">
             <Button onClick={startGame} className="w-full bg-green-500 hover:bg-green-600">
@@ -169,9 +171,14 @@ const PodMatchGame = ({ onGameEnd, onClose }: PodMatchGameProps) => {
           <p className="text-sm text-gray-500 mb-6">
             {matches === 8 ? "+20 Aroma Points earned!" : `+${Math.floor(matches * 2)} Aroma Points earned!`}
           </p>
-          <Button onClick={onClose} className="w-full bg-green-500 hover:bg-green-600">
-            Close
-          </Button>
+          <div className="space-y-2">
+            <Button onClick={onClose} className="w-full bg-green-500 hover:bg-green-600">
+              Close
+            </Button>
+            <Button onClick={startGame} variant="outline" className="w-full">
+              Play Again
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -185,7 +192,7 @@ const PodMatchGame = ({ onGameEnd, onClose }: PodMatchGameProps) => {
         <div className="flex gap-4 items-center">
           <div className="text-sm">Matches: {matches}/8</div>
           <div className="text-sm">Moves: {moves}</div>
-          <div className="text-lg font-bold">Time: {formatTime(timeLeft)}</div>
+          <div className="text-lg font-bold">Time: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</div>
           <Button onClick={() => endGame(false)} variant="outline" size="sm">
             End Game
           </Button>
