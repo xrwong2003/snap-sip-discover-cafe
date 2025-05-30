@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +25,7 @@ interface ProfileTabProps {
     rotation: string;
     animationStyle: string;
   }>>;
+  onAvatarSave: () => void;
 }
 
 const ProfileTab = ({ 
@@ -33,7 +33,8 @@ const ProfileTab = ({
   currentStreak,
   earnedBadges,
   avatarCustomization,
-  setAvatarCustomization
+  setAvatarCustomization,
+  onAvatarSave
 }: ProfileTabProps) => {
   const { toast } = useToast();
   const [showCustomization, setShowCustomization] = useState(false);
@@ -44,6 +45,7 @@ const ProfileTab = ({
       description: "+50 Aroma Points earned for customizing your avatar!",
     });
     setShowCustomization(false);
+    onAvatarSave();
   };
 
   return (
