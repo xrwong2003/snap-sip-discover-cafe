@@ -196,6 +196,11 @@ const QuizResults = () => {
     // In a real implementation, this would launch the game interface
   };
 
+  const handleAvatarSave = () => {
+    // Avatar save logic - could update user preferences, etc.
+    console.log('Avatar saved with customization:', avatarCustomization);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -214,6 +219,7 @@ const QuizResults = () => {
                 earnedBadges={earnedBadges}
                 avatarCustomization={avatarCustomization}
                 setAvatarCustomization={setAvatarCustomization}
+                onAvatarSave={handleAvatarSave}
               />
             )}
 
