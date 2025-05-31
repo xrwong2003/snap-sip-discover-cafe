@@ -31,7 +31,6 @@ const DailyActivitiesTab = ({
   // Daily Brew Streak State
   const [weeklyStreak, setWeeklyStreak] = useState([true, true, false, true, true, false, false]); 
   const [hasBrewedToday, setHasBrewedToday] = useState(false);
-  const [consecutiveStreak, setConsecutiveStreak] = useState(currentStreak);
   
   // Coffee Mood Quiz State
   const [moodQuizStep, setMoodQuizStep] = useState(0);
@@ -52,6 +51,18 @@ const DailyActivitiesTab = ({
   const [activeGame, setActiveGame] = useState<string | null>(null);
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // Get current day index (0 = Sunday, 1 = Monday, etc.)
+  const getCurrentDayIndex = () => {
+    return new Date().getDay();
+  };
+
+  // Calculate brewed days count - count orange-colored circles
+  const getBrewedDaysCount = () => {
+    const orangeDays = weeklyStreak.filter(day => day).length;
+    const todayCount = hasBrewedToday ? 1 : 0;
+    return orangeDays + todayCount;
+  };
 
   // Lifestyle/mood quiz questions
   const moodQuizQuestions = [
@@ -145,13 +156,6 @@ const DailyActivitiesTab = ({
     }
   ];
 
-  // Calculate brewed days count - count orange-colored circles
-  const getBrewedDaysCount = () => {
-    const orangeDays = weeklyStreak.filter(day => day).length;
-    const todayCount = hasBrewedToday ? 1 : 0;
-    return orangeDays + todayCount;
-  };
-
   // Check daily locks on component mount
   useEffect(() => {
     const today = new Date().toDateString();
@@ -172,39 +176,19 @@ const DailyActivitiesTab = ({
     if (lastBrewDate === today) {
       setHasBrewedToday(true);
     }
-
-    // Load consecutive streak from localStorage
-    const savedStreak = localStorage.getItem('consecutiveBrewStreak');
-    if (savedStreak) {
-      setConsecutiveStreak(parseInt(savedStreak));
-    }
   }, []);
 
   // Daily Brew Streak Functions
   const handleBrewToday = () => {
     const today = new Date().toDateString();
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    const lastBrewDate = localStorage.getItem('lastBrewDate');
+    const currentDayIndex = getCurrentDayIndex();
     
     setHasBrewedToday(true);
     localStorage.setItem('lastBrewDate', today);
     
-    // Calculate new consecutive streak
-    let newStreak = 1;
-    if (lastBrewDate === yesterday) {
-      // Continue streak
-      newStreak = consecutiveStreak + 1;
-    } else if (lastBrewDate !== today) {
-      // Start new streak or reset
-      newStreak = 1;
-    }
-    
-    setConsecutiveStreak(newStreak);
-    localStorage.setItem('consecutiveBrewStreak', newStreak.toString());
-    
-    // Update today's status in weekly streak (assuming today is index 4 - Thursday)
+    // Update today's status in weekly streak
     const updatedStreak = [...weeklyStreak];
-    updatedStreak[4] = true; // Mark today as brewed
+    updatedStreak[currentDayIndex] = true; // Mark today as brewed
     setWeeklyStreak(updatedStreak);
     
     toast({
@@ -361,7 +345,7 @@ const DailyActivitiesTab = ({
           <div className="flex justify-center mb-6">
             <div className="flex gap-2">
               {daysOfWeek.map((day, index) => {
-                const isToday = index === 4; // Thursday as example
+                const isToday = index === getCurrentDayIndex();
                 const isBrewedDay = weeklyStreak[index];
                 return (
                   <div key={day} className="text-center">
@@ -384,9 +368,6 @@ const DailyActivitiesTab = ({
           <div className="text-center">
             <div className="text-3xl font-bold text-amber-600 mb-2">
               {getBrewedDaysCount()} {getBrewedDaysCount() === 1 ? 'day' : 'days'}
-            </div>
-            <div className="text-lg text-gray-600 mb-4">
-              Consecutive Streak: {consecutiveStreak} {consecutiveStreak === 1 ? 'day' : 'days'}
             </div>
             
             {hasBrewedToday ? (
