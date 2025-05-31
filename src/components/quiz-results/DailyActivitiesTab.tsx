@@ -16,6 +16,88 @@ interface DailyActivitiesTabProps {
   moodCoffeeMatches: Record<string, any>;
 }
 
+// Quiz Questions Data
+const moodQuizQuestions = [
+  {
+    question: "How are you feeling about today?",
+    options: ["Energetic and ready to go", "Calm and relaxed", "Creative and inspiring", "Social and engaging"]
+  },
+  {
+    question: "What's your ideal coffee break?",
+    options: ["Quick energy boost", "Peaceful moment alone", "Brainstorming session", "Chatting with friends"]
+  },
+  {
+    question: "How do you like to start your morning?",
+    options: ["Fast-paced and efficient", "Slow and mindful", "With new ideas flowing", "Connecting with others"]
+  }
+];
+
+const factQuizQuestions = [
+  {
+    question: "Which country is the largest producer of coffee in the world?",
+    options: ["Colombia", "Brazil", "Vietnam", "Ethiopia"],
+    correct: 1,
+    explanation: "Brazil produces about 40% of the world's coffee supply!"
+  },
+  {
+    question: "What does 'espresso' mean in Italian?",
+    options: ["Strong coffee", "Quick coffee", "Pressed out", "Morning drink"],
+    correct: 2,
+    explanation: "'Espresso' means 'pressed out' - referring to the brewing method!"
+  },
+  {
+    question: "How many coffee beans does it take to make one cup of coffee?",
+    options: ["25-30 beans", "50-60 beans", "70-80 beans", "100-120 beans"],
+    correct: 2,
+    explanation: "It takes approximately 70-80 coffee beans to make one cup!"
+  },
+  {
+    question: "Which type of coffee bean is most commonly used worldwide?",
+    options: ["Arabica", "Robusta", "Liberica", "Excelsa"],
+    correct: 0,
+    explanation: "Arabica beans make up about 60-70% of global coffee production!"
+  },
+  {
+    question: "What temperature should water be for optimal coffee brewing?",
+    options: ["180-185°F", "190-196°F", "200-205°F", "210-212°F"],
+    correct: 1,
+    explanation: "The ideal water temperature is 190-196°F for optimal extraction!"
+  }
+];
+
+const playableGames = [
+  {
+    id: 'bean-hunt',
+    name: 'Bean Hunt',
+    description: 'Find hidden coffee beans in the plantation!',
+    difficulty: 'Easy',
+    time: '2 min',
+    points: 30,
+    icon: '🫘',
+    color: 'bg-amber-500'
+  },
+  {
+    id: 'pod-match',
+    name: 'Pod Match',
+    description: 'Match coffee pods to create perfect combinations!',
+    difficulty: 'Medium',
+    time: '3 min',
+    points: 50,
+    icon: '☕',
+    color: 'bg-orange-500'
+  },
+  {
+    id: 'brew-master',
+    name: 'Brew Master',
+    description: 'Test your coffee brewing skills and timing!',
+    difficulty: 'Hard',
+    time: '5 min',
+    points: 80,
+    icon: '⚡',
+    color: 'bg-red-500'
+  }
+];
+
 const DailyActivitiesTab = ({ 
   currentStreak, 
   dailyFact, 
