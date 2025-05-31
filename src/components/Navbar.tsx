@@ -15,6 +15,8 @@ const Navbar = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
 
+  const isMainPage = location.pathname === '/';
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -112,7 +114,7 @@ const Navbar = () => {
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
-      }`}>
+      } ${isMainPage ? 'border-b border-white/20' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
@@ -120,7 +122,7 @@ const Navbar = () => {
                 <span className="font-bold text-2xl text-nescafe-red">
                   NESCAFÉ
                 </span>
-                <span className="ml-2 font-medium text-nescafe-brown">
+                <span className="ml-2 font-medium text-nescafe-black">
                   Snap & Sip AI
                 </span>
               </button>
@@ -130,19 +132,19 @@ const Navbar = () => {
             <div className="hidden md:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('how-it-works')}
-                className="font-medium transition-colors duration-300 text-nescafe-brown hover:text-nescafe-red"
+                className="font-medium transition-colors duration-300 text-nescafe-black hover:text-nescafe-red"
               >
                 How It Works
               </button>
               <button 
                 onClick={() => scrollToSection('coffee-personas')}
-                className="font-medium transition-colors duration-300 text-nescafe-brown hover:text-nescafe-red"
+                className="font-medium transition-colors duration-300 text-nescafe-black hover:text-nescafe-red"
               >
                 Coffee Personas
               </button>
               <button 
                 onClick={() => scrollToSection('products')}
-                className="font-medium transition-colors duration-300 text-nescafe-brown hover:text-nescafe-red"
+                className="font-medium transition-colors duration-300 text-nescafe-black hover:text-nescafe-red"
               >
                 Products
               </button>
@@ -159,7 +161,7 @@ const Navbar = () => {
             <div className="md:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 rounded-md transition-colors text-nescafe-brown"
+                className="p-2 rounded-md transition-colors text-nescafe-black"
               >
                 {isMobileMenuOpen ? (
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -180,19 +182,19 @@ const Navbar = () => {
               <div className="flex flex-col gap-4">
                 <button 
                   onClick={() => scrollToSection('how-it-works')}
-                  className="block px-4 py-2 text-left text-nescafe-brown hover:bg-nescafe-cream rounded-md font-medium transition-colors"
+                  className="block px-4 py-2 text-left text-nescafe-black hover:bg-nescafe-cream rounded-md font-medium transition-colors"
                 >
                   How It Works
                 </button>
                 <button 
                   onClick={() => scrollToSection('coffee-personas')}
-                  className="block px-4 py-2 text-left text-nescafe-brown hover:bg-nescafe-cream rounded-md font-medium transition-colors"
+                  className="block px-4 py-2 text-left text-nescafe-black hover:bg-nescafe-cream rounded-md font-medium transition-colors"
                 >
                   Coffee Personas
                 </button>
                 <button 
                   onClick={() => scrollToSection('products')}
-                  className="block px-4 py-2 text-left text-nescafe-brown hover:bg-nescafe-cream rounded-md font-medium transition-colors"
+                  className="block px-4 py-2 text-left text-nescafe-black hover:bg-nescafe-cream rounded-md font-medium transition-colors"
                 >
                   Products
                 </button>

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -146,6 +147,10 @@ const Index = () => {
   const handleAvatarSave = () => {
     // Do not scroll or move viewport when saving avatar - keep page static
     console.log('Avatar saved with customization:', avatarCustomization);
+    toast({
+      title: "Avatar Saved!",
+      description: "Your coffee avatar has been updated successfully.",
+    });
   };
 
   if (showWelcome) {
@@ -194,6 +199,9 @@ const Index = () => {
                 handleUpdateMood={handleUpdateMood}
                 handlePlayGame={handlePlayGame}
                 moodCoffeeMatches={moodCoffeeMatches}
+                setCurrentStreak={setCurrentStreak}
+                setEarnedBadges={setEarnedBadges}
+                earnedBadges={earnedBadges}
               />
             )}
 
