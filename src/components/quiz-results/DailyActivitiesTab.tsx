@@ -28,10 +28,9 @@ const DailyActivitiesTab = ({
 }: DailyActivitiesTabProps) => {
   const { toast } = useToast();
   
-  // Daily Brew Streak State
+  // Daily Brew Streak State - Updated Logic
   const [weeklyStreak, setWeeklyStreak] = useState([true, true, false, true, true, false, false]); 
   const [hasBrewedToday, setHasBrewedToday] = useState(false);
-  const [consecutiveStreak, setConsecutiveStreak] = useState(currentStreak);
   
   // Coffee Mood Quiz State
   const [moodQuizStep, setMoodQuizStep] = useState(0);
@@ -51,105 +50,15 @@ const DailyActivitiesTab = ({
   // Game states
   const [activeGame, setActiveGame] = useState<string | null>(null);
 
+  // Get current day of week (0 = Sunday, 6 = Saturday)
+  const currentDayIndex = new Date().getDay();
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // Lifestyle/mood quiz questions
-  const moodQuizQuestions = [
-    { 
-      question: "How would you describe your energy level today?", 
-      options: ["Low and sleepy", "Calm and steady", "Energetic and focused", "High and buzzing", "Tired but motivated"] 
-    },
-    { 
-      question: "What's your ideal way to spend the morning?", 
-      options: ["Slow and peaceful", "Quick and efficient", "Creative and inspiring", "Social and engaging", "Active and dynamic"] 
-    },
-    { 
-      question: "How do you prefer to work?", 
-      options: ["In quiet solitude", "With background ambiance", "In bursts of intensity", "Collaboratively with others", "With music and movement"] 
-    },
-    { 
-      question: "What flavor profile appeals to you right now?", 
-      options: ["Rich and bold", "Smooth and creamy", "Sweet and comforting", "Fresh and light", "Complex and adventurous"] 
-    },
-    { 
-      question: "What's your current mood?", 
-      options: ["Relaxed and content", "Focused and determined", "Creative and inspired", "Social and cheerful", "Adventurous and bold"] 
-    }
-  ];
-
-  // Coffee fact quiz questions
-  const factQuizQuestions = [
-    { 
-      question: "Which country produces the most coffee?", 
-      options: ["Colombia", "Brazil", "Ethiopia", "Vietnam"], 
-      correct: 1,
-      explanation: "Brazil is the world's largest coffee producer, accounting for about 40% of global coffee production."
-    },
-    { 
-      question: "What does 'espresso' mean in Italian?", 
-      options: ["Strong", "Fast", "Pressed out", "Dark"], 
-      correct: 2,
-      explanation: "Espresso means 'pressed out' in Italian, referring to how the coffee is made by forcing hot water through finely ground coffee."
-    },
-    { 
-      question: "How many coffee beans are typically in one coffee cherry?", 
-      options: ["1", "2", "3", "4"], 
-      correct: 1,
-      explanation: "A coffee cherry typically contains two coffee beans, though sometimes there's only one (called a peaberry)."
-    },
-    { 
-      question: "When was instant coffee invented?", 
-      options: ["1901", "1910", "1920", "1930"], 
-      correct: 0,
-      explanation: "Instant coffee was invented in 1901 by Japanese scientist Satori Kato."
-    },
-    { 
-      question: "Which coffee brewing method extracts the most caffeine?", 
-      options: ["Espresso", "French Press", "Drip Coffee", "Cold Brew"], 
-      correct: 3,
-      explanation: "Cold brew typically extracts the most caffeine due to the long steeping time, despite using cold water."
-    }
-  ];
-
-  // Available games with updated durations
-  const playableGames = [
-    { 
-      id: 'bean-hunt',
-      name: "Bean Hunt", 
-      difficulty: "Easy", 
-      time: "30 sec", 
-      points: 15, 
-      description: "Catch falling coffee beans with your basket!",
-      icon: "☕",
-      color: "bg-orange-500"
-    },
-    { 
-      id: 'pod-match',
-      name: "Pod Match", 
-      difficulty: "Medium", 
-      time: "1 min", 
-      points: 20, 
-      description: "Match coffee pod pairs",
-      icon: "🍀",
-      color: "bg-green-500"
-    },
-    { 
-      id: 'brew-master',
-      name: "Brew Master", 
-      difficulty: "Hard", 
-      time: "2 min", 
-      points: 30, 
-      description: "Master the coffee brewing process",
-      icon: "🔥",
-      color: "bg-blue-500"
-    }
-  ];
-
-  // Calculate brewed days count - count orange-colored circles
+  // Calculate total brewed days this week (count orange circles)
   const getBrewedDaysCount = () => {
-    const orangeDays = weeklyStreak.filter(day => day).length;
+    const pastBrewedDays = weeklyStreak.filter(day => day).length;
     const todayCount = hasBrewedToday ? 1 : 0;
-    return orangeDays + todayCount;
+    return pastBrewedDays + todayCount;
   };
 
   // Check daily locks on component mount
@@ -172,40 +81,14 @@ const DailyActivitiesTab = ({
     if (lastBrewDate === today) {
       setHasBrewedToday(true);
     }
-
-    // Load consecutive streak from localStorage
-    const savedStreak = localStorage.getItem('consecutiveBrewStreak');
-    if (savedStreak) {
-      setConsecutiveStreak(parseInt(savedStreak));
-    }
   }, []);
 
   // Daily Brew Streak Functions
   const handleBrewToday = () => {
     const today = new Date().toDateString();
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    const lastBrewDate = localStorage.getItem('lastBrewDate');
     
     setHasBrewedToday(true);
     localStorage.setItem('lastBrewDate', today);
-    
-    // Calculate new consecutive streak
-    let newStreak = 1;
-    if (lastBrewDate === yesterday) {
-      // Continue streak
-      newStreak = consecutiveStreak + 1;
-    } else if (lastBrewDate !== today) {
-      // Start new streak or reset
-      newStreak = 1;
-    }
-    
-    setConsecutiveStreak(newStreak);
-    localStorage.setItem('consecutiveBrewStreak', newStreak.toString());
-    
-    // Update today's status in weekly streak (assuming today is index 4 - Thursday)
-    const updatedStreak = [...weeklyStreak];
-    updatedStreak[4] = true; // Mark today as brewed
-    setWeeklyStreak(updatedStreak);
     
     toast({
       title: "☑ Brewed Today!",
@@ -221,7 +104,6 @@ const DailyActivitiesTab = ({
     if (moodQuizStep < moodQuizQuestions.length - 1) {
       setMoodQuizStep(moodQuizStep + 1);
     } else {
-      // Quiz completed - analyze mood
       analyzeMoodResults(newAnswers);
     }
   };
@@ -236,7 +118,6 @@ const DailyActivitiesTab = ({
       "social": { emoji: "😊", mood: "Feeling Social", recipe: "NESCAFÉ Iced Coffee" }
     };
     
-    // Determine mood based on answers (simplified logic)
     let dominantMood = "relaxed";
     if (answers.some(a => a.includes("energetic") || a.includes("focused"))) dominantMood = "focused";
     if (answers.some(a => a.includes("creative") || a.includes("inspiring"))) dominantMood = "creative";
@@ -252,7 +133,6 @@ const DailyActivitiesTab = ({
     
     setMoodQuizCompleted(true);
     
-    // Lock quiz for today
     const today = new Date().toDateString();
     localStorage.setItem('moodQuizDate', today);
     setMoodQuizLocked(true);
@@ -281,7 +161,6 @@ const DailyActivitiesTab = ({
       setFactQuizScore(factQuizScore + 1);
     }
     
-    // Show explanation
     toast({
       title: isCorrect ? "Correct! +10 Aroma Points" : "Incorrect",
       description: currentQuestion.explanation,
@@ -289,16 +168,13 @@ const DailyActivitiesTab = ({
     });
     
     if (factQuizStep < factQuizQuestions.length - 1) {
-      // Auto-proceed to next question after 2 seconds
       setTimeout(() => {
         setFactQuizStep(factQuizStep + 1);
       }, 3000);
     } else {
-      // Quiz completed
       setTimeout(() => {
         setFactQuizCompleted(true);
         
-        // Lock quiz for today
         const today = new Date().toDateString();
         localStorage.setItem('factQuizDate', today);
         setFactQuizLocked(true);
@@ -352,7 +228,7 @@ const DailyActivitiesTab = ({
         <BrewMasterGame onGameEnd={handleGameEnd} onClose={handleCloseGame} />
       )}
 
-      {/* Daily Brew Streak */}
+      {/* Updated Daily Brew Streak */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-amber-500 to-amber-700 p-6">
           <h2 className="text-2xl font-bold text-white">Daily Brew Streak</h2>
@@ -361,17 +237,17 @@ const DailyActivitiesTab = ({
           <div className="flex justify-center mb-6">
             <div className="flex gap-2">
               {daysOfWeek.map((day, index) => {
-                const isToday = index === 4; // Thursday as example
+                const isToday = index === currentDayIndex;
                 const isBrewedDay = weeklyStreak[index];
                 return (
                   <div key={day} className="text-center">
                     <div className="text-xs text-gray-600 mb-1">{day}</div>
                     <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center ${
                       isToday && hasBrewedToday
-                        ? 'bg-orange-600 border-orange-600 text-white shadow-lg' // Dark orange for today brewed
+                        ? 'bg-orange-600 border-orange-600 text-white shadow-lg'
                         : isBrewedDay 
-                          ? 'bg-orange-400 border-orange-400 text-white' // Light orange for past brewed days
-                          : 'bg-gray-200 border-gray-300 text-gray-400' // Gray for unbrewed/future
+                          ? 'bg-orange-400 border-orange-400 text-white'
+                          : 'bg-gray-200 border-gray-300 text-gray-400'
                     }`}>
                       {isBrewedDay || (isToday && hasBrewedToday) ? '☕' : '○'}
                     </div>
@@ -384,9 +260,6 @@ const DailyActivitiesTab = ({
           <div className="text-center">
             <div className="text-3xl font-bold text-amber-600 mb-2">
               {getBrewedDaysCount()} {getBrewedDaysCount() === 1 ? 'day' : 'days'}
-            </div>
-            <div className="text-lg text-gray-600 mb-4">
-              Consecutive Streak: {consecutiveStreak} {consecutiveStreak === 1 ? 'day' : 'days'}
             </div>
             
             {hasBrewedToday ? (
