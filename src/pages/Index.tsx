@@ -144,12 +144,8 @@ const Index = () => {
   };
 
   const handleAvatarSave = () => {
-    // Do not scroll - keep viewport static
+    // Do not scroll or move viewport when saving avatar - keep page static
     console.log('Avatar saved with customization:', avatarCustomization);
-    toast({
-      title: "Avatar Saved!",
-      description: "Your coffee avatar has been successfully updated.",
-    });
   };
 
   if (showWelcome) {
