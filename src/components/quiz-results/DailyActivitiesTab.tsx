@@ -57,11 +57,24 @@ const DailyActivitiesTab = ({
     return new Date().getDay();
   };
 
-  // Calculate brewed days count - count orange-colored circles
+  // Calculate brewed days count - count only orange-colored circles
   const getBrewedDaysCount = () => {
-    const orangeDays = weeklyStreak.filter(day => day).length;
-    const todayCount = hasBrewedToday ? 1 : 0;
-    return orangeDays + todayCount;
+    const currentDayIndex = getCurrentDayIndex();
+    let brewedCount = 0;
+    
+    // Count past brewed days (light orange circles)
+    weeklyStreak.forEach((isBrewedDay, index) => {
+      if (index !== currentDayIndex && isBrewedDay) {
+        brewedCount++;
+      }
+    });
+    
+    // Count today if brewed (dark orange circle)
+    if (hasBrewedToday) {
+      brewedCount++;
+    }
+    
+    return brewedCount;
   };
 
   // Lifestyle/mood quiz questions
