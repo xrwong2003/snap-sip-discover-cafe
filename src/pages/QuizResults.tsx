@@ -235,9 +235,6 @@ const QuizResults = () => {
                 handleUpdateMood={handleUpdateMood}
                 handlePlayGame={handlePlayGame}
                 moodCoffeeMatches={moodCoffeeMatches}
-                setCurrentStreak={setCurrentStreak}
-                setEarnedBadges={setEarnedBadges}
-                earnedBadges={earnedBadges}
               />
             )}
 
