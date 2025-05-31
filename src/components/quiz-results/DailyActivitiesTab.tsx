@@ -138,9 +138,14 @@ const DailyActivitiesTab = ({
 
   // Calculate total brewed days this week (count orange circles)
   const getBrewedDaysCount = () => {
-    const pastBrewedDays = weeklyStreak.filter(day => day).length;
-    const todayCount = hasBrewedToday ? 1 : 0;
-    return pastBrewedDays + todayCount;
+    let count = 0;
+    // Count existing brewed days in the week
+    weeklyStreak.forEach(day => {
+      if (day) count++;
+    });
+    // Add today if brewed
+    if (hasBrewedToday) count++;
+    return count;
   };
 
   // Check daily locks on component mount
