@@ -99,20 +99,16 @@ const Index = () => {
       }
     }
 
-    // Handle hash navigation from header
-    const handleHashNavigation = () => {
-      const hash = window.location.hash.substring(1);
-      if (hash && showWelcome) {
-        setTimeout(() => {
-          const element = document.getElementById(hash);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 100);
-      }
-    };
-
-    handleHashNavigation();
+    // Handle hash navigation from header - check for hash and scroll to section
+    const hash = window.location.hash.substring(1);
+    if (hash && !showWelcome) {
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
   }, [personaName, todayMood, showWelcome]);
 
   const handleUpdateMood = (mood: string) => {
@@ -144,8 +140,10 @@ const Index = () => {
   };
 
   const handleAvatarSave = () => {
-    // Do not scroll or move viewport when saving avatar - keep page static
+    // Explicitly prevent any scrolling behavior when saving avatar
+    // Keep viewport completely static
     console.log('Avatar saved with customization:', avatarCustomization);
+    // No scrolling, no viewport changes, no DOM manipulation that could trigger scroll
   };
 
   if (showWelcome) {

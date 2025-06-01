@@ -28,14 +28,8 @@ const Navbar = () => {
   const scrollToSection = (elementId: string) => {
     // Always navigate to main page first if not already there
     if (location.pathname !== '/') {
-      navigate('/', { replace: true });
-      // Wait for navigation, then scroll
-      setTimeout(() => {
-        const element = document.getElementById(elementId);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 100);
+      // Navigate to main page with hash for proper section scrolling
+      navigate(`/#${elementId}`, { replace: true });
     } else {
       // Already on main page, scroll directly
       const element = document.getElementById(elementId);

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -39,12 +40,18 @@ const ProfileTab = ({
   const { toast } = useToast();
   const [showCustomization, setShowCustomization] = useState(false);
 
-  const handleSaveAvatar = () => {
+  const handleSaveAvatar = (e: React.MouseEvent) => {
+    // Prevent any default behavior that might cause scrolling
+    e.preventDefault();
+    e.stopPropagation();
+    
     toast({
       title: "Avatar Saved!",
       description: "+50 Aroma Points earned for customizing your avatar!",
     });
     setShowCustomization(false);
+    
+    // Call the parent callback without any scrolling side effects
     onAvatarSave();
   };
 
@@ -163,6 +170,7 @@ const ProfileTab = ({
                   <Button 
                     className="mt-4 bg-green-500 hover:bg-green-600 text-white w-full"
                     onClick={handleSaveAvatar}
+                    type="button"
                   >
                     Save Avatar (+50 Aroma Points)
                   </Button>
