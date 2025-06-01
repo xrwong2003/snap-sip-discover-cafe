@@ -29,7 +29,7 @@ const DailyActivitiesTab = ({
   const { toast } = useToast();
   
   // Daily Brew Streak State
-  const [weeklyStreak, setWeeklyStreak] = useState([true, true, false, true, true, false, false]); 
+  const [weeklyStreak, setWeeklyStreak] = useState([false, false, false, false, false, false, false]); 
   const [hasBrewedToday, setHasBrewedToday] = useState(false);
   
   // Coffee Mood Quiz State
@@ -55,6 +55,26 @@ const DailyActivitiesTab = ({
   // Get current day index (0 = Sunday, 1 = Monday, etc.)
   const getCurrentDayIndex = () => {
     return new Date().getDay();
+  };
+
+  // Check if it's a new week and reset if needed
+  const checkAndResetWeeklyStreak = () => {
+    const today = new Date();
+    const currentWeekStart = new Date(today);
+    currentWeekStart.setDate(today.getDate() - today.getDay()); // Get Sunday of current week
+    currentWeekStart.setHours(0, 0, 0, 0);
+    
+    const lastWeekStart = localStorage.getItem('lastWeekStart');
+    const currentWeekStartString = currentWeekStart.toISOString();
+    
+    if (lastWeekStart !== currentWeekStartString) {
+      // New week detected - reset everything
+      setWeeklyStreak([false, false, false, false, false, false, false]);
+      setHasBrewedToday(false);
+      localStorage.setItem('lastWeekStart', currentWeekStartString);
+      localStorage.removeItem('weeklyStreakData');
+      localStorage.removeItem('lastBrewDate');
+    }
   };
 
   // Calculate brewed days count - count only orange-colored circles
@@ -169,12 +189,26 @@ const DailyActivitiesTab = ({
     }
   ];
 
-  // Check daily locks on component mount
+  // Check daily locks and weekly reset on component mount
   useEffect(() => {
+    // Check for weekly reset first
+    checkAndResetWeeklyStreak();
+    
     const today = new Date().toDateString();
     const moodQuizDate = localStorage.getItem('moodQuizDate');
     const factQuizDate = localStorage.getItem('factQuizDate');
     const lastBrewDate = localStorage.getItem('lastBrewDate');
+    
+    // Load saved weekly streak data
+    const savedWeeklyStreak = localStorage.getItem('weeklyStreakData');
+    if (savedWeeklyStreak) {
+      try {
+        const parsedStreak = JSON.parse(savedWeeklyStreak);
+        setWeeklyStreak(parsedStreak);
+      } catch (e) {
+        // If parsing fails, keep default state
+      }
+    }
     
     if (moodQuizDate === today) {
       setMoodQuizLocked(true);
@@ -190,6 +224,11 @@ const DailyActivitiesTab = ({
       setHasBrewedToday(true);
     }
   }, []);
+
+  // Save weekly streak data whenever it changes
+  useEffect(() => {
+    localStorage.setItem('weeklyStreakData', JSON.stringify(weeklyStreak));
+  }, [weeklyStreak]);
 
   // Daily Brew Streak Functions
   const handleBrewToday = () => {
