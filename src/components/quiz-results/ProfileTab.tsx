@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -40,27 +41,34 @@ const ProfileTab = ({
   const [showCustomization, setShowCustomization] = useState(false);
 
   const handleSaveAvatar = (e: React.MouseEvent) => {
-    // Prevent any default behavior that might cause scrolling
     e.preventDefault();
     e.stopPropagation();
     
-    // Store current scroll position to restore if needed
+    // Store current scroll position and lock it
     const currentScrollY = window.scrollY;
+    const currentScrollX = window.scrollX;
     
-    toast({
-      title: "Avatar Saved!",
-      description: "+50 Aroma Points earned for customizing your avatar!",
-    });
+    // Temporarily disable scrolling
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    
+    // Show toast without allowing any scroll
+    setTimeout(() => {
+      toast({
+        title: "Avatar Saved!",
+        description: "+50 Aroma Points earned for customizing your avatar!",
+      });
+    }, 0);
+    
     setShowCustomization(false);
     
-    // Ensure scroll position doesn't change
-    requestAnimationFrame(() => {
-      if (window.scrollY !== currentScrollY) {
-        window.scrollTo({ top: currentScrollY, behavior: 'auto' });
-      }
-    });
+    // Restore scroll position and re-enable scrolling after a short delay
+    setTimeout(() => {
+      window.scrollTo({ top: currentScrollY, left: currentScrollX, behavior: 'auto' });
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }, 50);
     
-    // Call the parent callback without any scrolling side effects
     onAvatarSave();
   };
 
