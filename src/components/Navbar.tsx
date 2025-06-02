@@ -26,26 +26,28 @@ const Navbar = () => {
   }, []);
 
   const scrollToSection = (elementId: string) => {
-    // Always navigate to main page first if not already there
-    if (location.pathname !== '/') {
-      // Navigate to main page with hash for proper section scrolling
-      navigate(`/#${elementId}`, { replace: true });
-    } else {
-      // Already on main page, scroll directly
+    // Always navigate to main page first
+    navigate('/', { replace: true });
+    
+    // Wait for navigation to complete, then scroll to section
+    setTimeout(() => {
       const element = document.getElementById(elementId);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }
+    }, 100);
+    
     setIsMobileMenuOpen(false);
   };
 
   const handleLogoClick = () => {
-    if (location.pathname !== '/') {
-      navigate('/', { replace: true });
-    } else {
+    // Always navigate to main page and scroll to top
+    navigate('/', { replace: true });
+    
+    // Wait for navigation to complete, then scroll to top
+    setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    }, 100);
   };
 
   const startCamera = async () => {
