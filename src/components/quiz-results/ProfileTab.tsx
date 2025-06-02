@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -45,11 +44,21 @@ const ProfileTab = ({
     e.preventDefault();
     e.stopPropagation();
     
+    // Store current scroll position to restore if needed
+    const currentScrollY = window.scrollY;
+    
     toast({
       title: "Avatar Saved!",
       description: "+50 Aroma Points earned for customizing your avatar!",
     });
     setShowCustomization(false);
+    
+    // Ensure scroll position doesn't change
+    requestAnimationFrame(() => {
+      if (window.scrollY !== currentScrollY) {
+        window.scrollTo({ top: currentScrollY, behavior: 'auto' });
+      }
+    });
     
     // Call the parent callback without any scrolling side effects
     onAvatarSave();
@@ -171,6 +180,7 @@ const ProfileTab = ({
                     className="mt-4 bg-green-500 hover:bg-green-600 text-white w-full"
                     onClick={handleSaveAvatar}
                     type="button"
+                    onFocus={(e) => e.preventDefault()}
                   >
                     Save Avatar (+50 Aroma Points)
                   </Button>
