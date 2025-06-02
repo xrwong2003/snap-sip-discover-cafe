@@ -44,32 +44,41 @@ const ProfileTab = ({
     e.preventDefault();
     e.stopPropagation();
     
-    // Store current scroll position and lock it
+    // Completely prevent any scrolling behavior
+    const body = document.body;
+    const html = document.documentElement;
     const currentScrollY = window.scrollY;
     const currentScrollX = window.scrollX;
     
-    // Temporarily disable scrolling
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
+    // Lock the scroll position completely
+    body.style.position = 'fixed';
+    body.style.top = `-${currentScrollY}px`;
+    body.style.left = `-${currentScrollX}px`;
+    body.style.width = '100%';
+    body.style.height = '100%';
+    body.style.overflow = 'hidden';
+    html.style.overflow = 'hidden';
     
-    // Show toast without allowing any scroll
-    setTimeout(() => {
-      toast({
-        title: "Avatar Saved!",
-        description: "+50 Aroma Points earned for customizing your avatar!",
-      });
-    }, 0);
+    // Show toast immediately
+    toast({
+      title: "Avatar Saved!",
+      description: "+50 Aroma Points earned for customizing your avatar!",
+    });
     
     setShowCustomization(false);
-    
-    // Restore scroll position and re-enable scrolling after a short delay
-    setTimeout(() => {
-      window.scrollTo({ top: currentScrollY, left: currentScrollX, behavior: 'auto' });
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    }, 50);
-    
     onAvatarSave();
+    
+    // Restore scroll position after a very short delay
+    setTimeout(() => {
+      body.style.position = '';
+      body.style.top = '';
+      body.style.left = '';
+      body.style.width = '';
+      body.style.height = '';
+      body.style.overflow = '';
+      html.style.overflow = '';
+      window.scrollTo({ top: currentScrollY, left: currentScrollX, behavior: 'auto' });
+    }, 100);
   };
 
   return (
@@ -188,7 +197,6 @@ const ProfileTab = ({
                     className="mt-4 bg-green-500 hover:bg-green-600 text-white w-full"
                     onClick={handleSaveAvatar}
                     type="button"
-                    onFocus={(e) => e.preventDefault()}
                   >
                     Save Avatar (+50 Aroma Points)
                   </Button>
