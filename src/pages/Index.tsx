@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import { useToast } from "@/hooks/use-toast";
+import { useSearchParams } from 'react-router-dom';
 import { 
   coffeeFacts, 
   miniGames,
@@ -39,6 +40,7 @@ const personaDetails = {
 
 const Index = () => {
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [showWelcome, setShowWelcome] = useState(true);
   const [dailyFact, setDailyFact] = useState<string>("");
   const [currentStreak, setCurrentStreak] = useState<number>(0);
@@ -61,6 +63,20 @@ const Index = () => {
   const persona = personaDetails[personaName as keyof typeof personaDetails];
 
   useEffect(() => {
+    // Check for tab parameter in URL
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'daily') {
+      setShowWelcome(false);
+      setActiveTab('daily');
+    }
+
+    // Listen for custom tab change events
+    const handleSetActiveTab = (event: CustomEvent) => {
+      setActiveTab(event.detail);
+    };
+
+    window.addEventListener('setActiveTab', handleSetActiveTab as EventListener);
+
     // Get daily coffee fact
     const factIndex = Math.floor(Math.random() * coffeeFacts.length);
     setDailyFact(coffeeFacts[factIndex]);
@@ -109,7 +125,11 @@ const Index = () => {
         }
       }, 100);
     }
-  }, [personaName, todayMood, showWelcome]);
+
+    return () => {
+      window.removeEventListener('setActiveTab', handleSetActiveTab as EventListener);
+    };
+  }, [personaName, todayMood, showWelcome, searchParams]);
 
   const handleUpdateMood = (mood: string) => {
     setTodayMood(mood);

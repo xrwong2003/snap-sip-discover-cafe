@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const coffeePersonas = [
   {
@@ -33,6 +34,23 @@ const coffeePersonas = [
 ];
 
 const CoffeePersonasSection = () => {
+  const navigate = useNavigate();
+
+  const handleTakeQuiz = () => {
+    // Navigate to the main page with the daily tab active
+    navigate('/?tab=daily', { replace: true });
+    
+    // Wait for navigation and tab change, then scroll to coffee mood quiz
+    setTimeout(() => {
+      // Set the active tab to daily activities
+      const event = new CustomEvent('setActiveTab', { detail: 'daily' });
+      window.dispatchEvent(event);
+      
+      // Scroll to the page top first to ensure proper positioning
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }, 100);
+  };
+
   return (
     <section className="bg-nescafe-cream py-16" id="coffee-personas">
       <div className="section-container">
@@ -60,7 +78,7 @@ const CoffeePersonasSection = () => {
         <div className="mt-12 text-center">
           <p className="text-nescafe-brown mb-4">Want to discover your persona?</p>
           <button 
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={handleTakeQuiz}
             className="bg-nescafe-red text-white px-8 py-3 rounded-lg hover:bg-nescafe-brown transition-colors duration-300 font-medium"
           >
             Take the Quiz
