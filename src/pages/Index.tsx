@@ -77,6 +77,13 @@ const Index = () => {
 
     window.addEventListener('setActiveTab', handleSetActiveTab as EventListener);
 
+    // Listen for reset to welcome events from navbar
+    const handleResetToWelcome = () => {
+      setShowWelcome(true);
+    };
+
+    window.addEventListener('resetToWelcome', handleResetToWelcome);
+
     // Get daily coffee fact
     const factIndex = Math.floor(Math.random() * coffeeFacts.length);
     setDailyFact(coffeeFacts[factIndex]);
@@ -128,6 +135,7 @@ const Index = () => {
 
     return () => {
       window.removeEventListener('setActiveTab', handleSetActiveTab as EventListener);
+      window.removeEventListener('resetToWelcome', handleResetToWelcome);
     };
   }, [personaName, todayMood, showWelcome, searchParams]);
 
