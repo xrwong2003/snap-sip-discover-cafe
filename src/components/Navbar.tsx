@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -26,23 +27,31 @@ const Navbar = () => {
   }, []);
 
   const scrollToSection = (elementId: string) => {
-    // Always navigate to main page first
-    navigate('/', { replace: true });
-    
-    // Wait for navigation to complete, then scroll to section
-    setTimeout(() => {
+    // If not on main page, navigate there first
+    if (location.pathname !== '/') {
+      navigate('/');
+      
+      // Wait for navigation to complete, then scroll to section
+      setTimeout(() => {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      // Already on main page, just scroll to section
       const element = document.getElementById(elementId);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 100);
+    }
     
     setIsMobileMenuOpen(false);
   };
 
   const handleLogoClick = () => {
-    // Always navigate to main page and scroll to top
-    navigate('/', { replace: true });
+    // Navigate to main page from any page
+    navigate('/');
     
     // Wait for navigation to complete, then scroll to top
     setTimeout(() => {
